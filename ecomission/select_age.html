@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eco Mission Challenge - Pilih Usia</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: #000;
+  }
+
+  /* Stage 1920x1080, di-scale agar selalu 16:9 dan muat di layar (HD, 2K, 4K) */
+  #stage {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 1920px; height: 1080px;
+    transform-origin: center center;
+    transform: translate(-50%, -50%) scale(var(--scale, 1));
+    background: url("assets/bg_home.png") center / cover no-repeat;
+    overflow: hidden;
+    user-select: none;
+  }
+  #stage img { position: absolute; display: block; pointer-events: none; }
+
+  /* Posisi diukur dari area gambar yang tidak transparan agar pas dengan referensi */
+  #title   { left: 719px; top: 34px;  width: 601px; animation: popIn .6s ease-out both, titleWobble 4s ease-in-out .6s infinite; }
+  #bubble  { left: 209px; top: 162px; width: 422px; transform-origin: 80% 100%; animation: popIn .5s ease-out .5s both, wiggle 4s ease-in-out 2.5s infinite; }
+  /* Maskot Bubum animasi menyapa (rig di bubum/menyapa.html) */
+  #maskot  { position: absolute; left: 64px; top: 385px; width: 520px; height: 651px; border: 0; background: transparent; pointer-events: none; }
+
+  /* Kartu pilihan usia */
+  .age {
+    position: absolute;
+    padding: 0; border: none; background: none;
+    cursor: pointer;
+    transition: transform .2s, filter .2s;
+  }
+  .age img { position: static !important; width: 100%; }
+  .age:hover { transform: translateY(-6px); }
+  .age.selected { transform: translateY(-6px) scale(1.03); }
+  /* Saat satu kartu dipilih, kartu lainnya jadi hitam-putih */
+  #stage.has-selection .age:not(.selected) { filter: grayscale(1); }
+  #age-under17  { left: 579px;  top: 395px; width: 378px; animation: popIn .5s ease-out 1s both; }
+  #age-17       { left: 959px;  top: 395px; width: 378px; animation: popIn .5s ease-out 1.5s both; }
+  #age-keluarga { left: 1336px; top: 391px; width: 406px; animation: popIn .5s ease-out 2s both; }
+
+  #continue {
+    position: absolute;
+    left: 690px; top: 866px;
+    width: 609px; height: 136px;
+    background: url("assets/btn_continue.png") center / contain no-repeat;
+    border: none; cursor: pointer;
+    transition: transform .15s, filter .2s;
+    animation: popIn .5s ease-out 2.6s both;
+  }
+  #continue.ready { animation: popIn .5s ease-out 2.6s both, pulse 1.6s ease-in-out infinite; }
+  #continue:not(.ready) { filter: grayscale(1); cursor: not-allowed; }
+  /* Saat hover hanya pulse yang dihentikan; popIn tetap dipertahankan agar tidak diputar ulang */
+  #continue.ready:hover  { transform: scale(1.05); animation: popIn .5s ease-out 2.6s both; }
+  #continue.ready:active { transform: scale(.97); }
+
+  /* Muncul berurutan: pakai opacity + properti `scale` agar tidak bentrok dengan `transform` animasi lain */
+  @keyframes popIn {
+    0%   { opacity: 0; scale: .6; }
+    70%  { opacity: 1; scale: 1.06; }
+    100% { opacity: 1; scale: 1; }
+  }
+
+  /* Saat memuat: layar kaca buram (ala iPhone) menutupi stage; semua animasi ditahan
+     sampai seluruh gambar (termasuk rig Bubum di iframe) selesai dimuat */
+  #veil {
+    position: absolute; inset: 0; z-index: 10;
+    backdrop-filter: blur(24px) saturate(1.4); -webkit-backdrop-filter: blur(24px) saturate(1.4);
+    background: rgba(255,255,255,.18);
+    transition: opacity .6s ease;
+  }
+  body:not(.loading) #veil { opacity: 0; pointer-events: none; }
+  .loading #stage *, .loading #stage { animation-play-state: paused !important; }
+  #maskot { transition: opacity .4s ease; }
+  .loading #maskot { opacity: 0; }
+
+  @keyframes bob  { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+  @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+  /* Gelembung teks: diam, lalu sesekali goyang-goyang (tanpa zoom) */
+  @keyframes wiggle {
+    0%, 60%, 100% { transform: rotate(0); }
+    66% { transform: rotate(-4deg); }
+    72% { transform: rotate(4deg); }
+    78% { transform: rotate(-3deg); }
+    84% { transform: rotate(2deg); }
+    90% { transform: rotate(0); }
+  }
+  /* Judul: berdenyut zoom pelan, lalu sesekali goyang-goyang sebentar */
+  @keyframes titleWobble {
+    0%, 100% { transform: scale(1) rotate(0); }
+    30%      { transform: scale(1.04) rotate(0); }
+    60%      { transform: scale(1) rotate(0); }
+    66%      { transform: scale(1.03) rotate(-3deg); }
+    72%      { transform: scale(1.03) rotate(3deg); }
+    78%      { transform: scale(1.03) rotate(-2deg); }
+    84%      { transform: scale(1.02) rotate(1.5deg); }
+    90%      { transform: scale(1) rotate(0); }
+  }
+</style>
+</head>
+<body class="loading">
+  <div id="stage">
+    <img id="title"  src="assets/title.png"         alt="Eco Mission Challenge">
+    <img id="bubble" src="assets/bubblespeech2.png" alt="Siapa yang mau ikut? Who wants to join?">
+    <iframe id="maskot" src="bubum/menyapa.html" title="Maskot Bubum" scrolling="no" allowtransparency="true"></iframe>
+
+    <button class="age" id="age-under17"  data-age="under17"><img src="assets/btn_under_17.png" alt="Kurang dari 17 tahun"></button>
+    <button class="age" id="age-17"       data-age="over17"><img src="assets/btn_17.png" alt="Lebih dari 17 tahun"></button>
+    <button class="age" id="age-keluarga" data-age="keluarga"><img src="assets/btn_keluarga.png" alt="Keluarga"></button>
+
+    <button id="continue" aria-label="Continue"></button>
+    <div id="veil"></div>
+  </div>
+
+<script src="sfx.js"></script>
+<script>
+  // Scaling responsif: jaga rasio 16:9, muat di layar berapa pun resolusinya
+  function fit() {
+    const s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    document.documentElement.style.setProperty('--scale', s);
+  }
+  window.addEventListener('resize', fit);
+  fit();
+
+  // `load` menunggu semua gambar dan iframe; baru setelah itu buka kaca buram dan mulai urutan animasi
+  window.addEventListener('load', () => document.body.classList.remove('loading'));
+
+  const btnContinue =document.getElementById('continue');
+  let selected = null;
+
+  document.querySelectorAll('.age').forEach(el => {
+    el.addEventListener('click', () => {
+      clickSfx();   // bunyi "tip" (sfx.js)
+      if (selected) selected.classList.remove('selected');
+      el.classList.add('selected');
+      selected = el;
+      document.getElementById('stage').classList.add('has-selection');
+      btnContinue.classList.add('ready');
+    });
+  });
+
+  btnContinue.addEventListener('click', () => {
+    if (!selected) return;
+    try { localStorage.setItem('ecomission_age', selected.dataset.age); } catch (e) {}
+    clickGo('introduction.html');
+  });
+</script>
+<script src="bgm.js"></script>
+</body>
+</html>

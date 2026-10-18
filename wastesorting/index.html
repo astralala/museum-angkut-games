@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"><title>Waste Sorting Hub</title><link rel="stylesheet" href="css/style.css">
+<style>
+#frame.idx{display:block;padding:0;background:url(assets/bg/bghomenocar.png) center/1080px 1920px no-repeat}
+.idx img{position:absolute;display:block;pointer-events:none}
+.idx .logo{left:396px;top:130px;width:287px}
+.idx .title{left:90px;top:360px;width:900px;animation:titleWobble 4s ease-in-out .7s infinite}
+/* Judul: berdenyut zoom pelan, lalu sesekali goyang-goyang sebentar (sama seperti judul choose_game Eco Mission) */
+@keyframes titleWobble{
+ 0%,100%{transform:scale(1) rotate(0)}
+ 30%{transform:scale(1.04) rotate(0)}
+ 60%{transform:scale(1) rotate(0)}
+ 66%{transform:scale(1.03) rotate(-3deg)}
+ 72%{transform:scale(1.03) rotate(3deg)}
+ 78%{transform:scale(1.03) rotate(-2deg)}
+ 84%{transform:scale(1.02) rotate(1.5deg)}
+ 90%{transform:scale(1) rotate(0)}
+}
+.idx .qr{left:40px;top:970px;width:1000px} /* assets/elements/scanqr2.png (1903x826): lebar, di tengah ruang antara judul & tombol guest */
+.idx .guest{position:absolute;left:275px;top:1460px;width:530px;height:177px;margin:0;padding:0;border-radius:80px;background:url(assets/btn/btnguest.png) center/100% 100% no-repeat;transition:transform .1s}
+.idx .guest:active{transform:scale(.95)}
+.idx .tabs{left:177px;top:1676px;width:726px}
+/* Buram tambahan khusus bagian atas latar (sama seperti introduction.html): penuh di tepi atas, memudar halus ke bawah */
+.idx .topblur{position:absolute;left:0;top:0;width:1080px;height:560px;pointer-events:none;overflow:hidden;
+ -webkit-mask-image:linear-gradient(#000 45%,transparent);mask-image:linear-gradient(#000 45%,transparent)}
+.idx .topblur::before{content:"";position:absolute;left:-40px;top:-40px;width:1160px;height:2000px;
+ background:url(assets/bg/bghomenocar.png) 40px 40px/1080px 1920px no-repeat;filter:blur(14px)}
+</style></head>
+<body><div id="frame" class="idx blurin">
+<div class="topblur"></div>
+<img class="logo" src="assets/elements/logo_toyota_berbagi.png" alt="Toyota Berbagi">
+<img class="title" src="assets/elements/titlehome.png" alt="Waste Sorting Hub">
+<img class="qr" src="assets/elements/scanqr2.png" alt="Scan QR kamu di kamera untuk bermain!">
+<button class="guest" aria-label="Play As Guest" onclick="SFX.click();goTo('home.html')"></button>
+<img class="tabs" src="assets/elements/3columnhometab.png" alt="">
+<script>window.CFG={}</script><script src="js/common.js"></script><script src="js/sheet.js"></script>
+</div></body></html>
