@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <title>Pilih Area</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div id="frame" class="ar blurin">
+      <div class="topblur"></div>
+      <img class="title" src="assets/elements/pilihsalahsatutitle.png" alt="Pilih satu tempat untuk dikunjungi!" />
+      <button class="card c1" aria-label="Perumahan" onclick="sel(this,'perumahan')"></button>
+      <button class="card c2" aria-label="Pertokoan" onclick="sel(this,'mall')"></button>
+      <button class="card c3" aria-label="Bengkel Mobil" onclick="sel(this,'bengkel')"></button>
+      <img class="info" src="assets/elements/pilihsalahsatu.png" alt="Pilih salah satu saja, tidak harus semuanya" />
+      <button class="next" id="go" aria-label="Continue" onclick="go()" disabled></button>
+      <video id="vid" src="assets/videos/mobilberangkat.mp4" muted playsinline preload="auto"></video>
+      <script>
+        window.CFG = {};
+      </script>
+      <script src="js/common.js"></script>
+      <script>
+        need("nama");
+        let area = null;
+        function sel(b, a) {
+          SFX.click();
+          area = a;
+          document.querySelectorAll(".card").forEach((c) => c.classList.toggle("on", c === b));
+          document.getElementById("frame").classList.add("picked");
+          document.getElementById("go").disabled = false;
+        }
+        let leaving = false;
+        function go() {
+          if (!area || leaving) return;
+          leaving = true;
+          SFX.click();
+          S.set("area", area);
+          const next = {
+            perumahan: "mobil-perumahan.html",
+            mall: "mobil-pertokoan.html",
+            bengkel: "mobil-bengkel.html",
+          }[area];
+          /* 1. sembunyikan elemen satu per satu (dari bawah ke atas) */
+          const els = ["#go", ".info", ".c3", ".c2", ".c1", ".title"].map((s) => document.querySelector(s));
+          els.forEach((el, n) => setTimeout(() => el.classList.add("out"), n * 160));
+          /* 2. putar video mobil berangkat, 3. akhiri dengan blur keluar */
+          const v = document.getElementById("vid");
+          let done = false;
+          const end = () => {
+            if (done) return;
+            done = true;
+            goTo(next);
+          };
+          setTimeout(
+            () => {
+              v.classList.add("on");
+              document.getElementById("frame").classList.add("playing");
+              v.play().catch((e) => {
+                if (e.name === "NotAllowedError") end();
+              });
+            },
+            els.length * 160 + 300,
+          );
+          v.addEventListener("ended", end);
+          v.addEventListener("error", end);
+          setTimeout(end, els.length * 160 + 300 + 9000);
+        }
+      </script>
+    </div>
+  </body>
+</html>

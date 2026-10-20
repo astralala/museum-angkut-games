@@ -1,0 +1,277 @@
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: transparent;
+  overflow: hidden;
+}
+
+/* Stage = gambar referensi (546 x 625) diperbesar 1.63x agar sama skala dengan layer */
+.stage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 890px;
+  height: 1019px;
+  transform-origin: 0 0;
+}
+.stage img {
+  position: absolute;
+  display: block;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Overlay referensi untuk mencocokkan posisi: buka dengan ?ref */
+.stage .ref {
+  left: 0;
+  top: 0;
+  width: 890px;
+  opacity: 0.35;
+  z-index: 99;
+  display: none;
+}
+.stage.show-ref .ref {
+  display: block;
+}
+.show-ref * {
+  animation-play-state: paused !important;
+}
+
+/* ---------- Kaki: melangkah riang bergantian di tempat ---------- */
+.leg-l {
+  left: 70px;
+  top: 655px;
+  width: 374px;
+  transform-origin: 85% 15%;
+  animation: stepL 1.55s ease-in-out infinite;
+}
+.leg-r {
+  left: 448px;
+  top: 680px;
+  width: 341px;
+  transform-origin: 10% 10%;
+  animation: stepR 1.55s ease-in-out infinite;
+}
+@keyframes stepL {
+  0%,
+  100% {
+    transform: rotate(-12deg) translateY(0);
+  }
+  25% {
+    transform: rotate(-6deg) translateY(-14px);
+  }
+  50% {
+    transform: rotate(-12deg) translateY(0);
+  }
+}
+@keyframes stepR {
+  0%,
+  50%,
+  100% {
+    transform: rotate(18deg) translateY(0);
+  }
+  75% {
+    transform: rotate(12deg) translateY(-14px);
+  }
+}
+
+/* ---------- Badan atas: memantul dua kali per siklus langkah ---------- */
+.upper {
+  position: absolute;
+  inset: 0;
+  transform-origin: 445px 780px;
+  animation: bounce 0.775s ease-in-out infinite;
+}
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
+  50% {
+    transform: translateY(-12px) scale(0.99, 1.012);
+  }
+}
+.sway {
+  position: absolute;
+  inset: 0;
+  transform-origin: 445px 780px;
+  animation: sway 1.55s ease-in-out infinite;
+}
+@keyframes sway {
+  0%,
+  100% {
+    transform: rotate(-1.5deg);
+  }
+  50% {
+    transform: rotate(1.5deg);
+  }
+}
+
+.body {
+  left: 150px;
+  top: 176px;
+  width: 652px;
+}
+.leaf {
+  left: 339px;
+  top: 0px;
+  width: 476px;
+  transform-origin: 30% 95%;
+  animation: leaf 1.55s ease-in-out infinite;
+}
+@keyframes leaf {
+  0%,
+  100% {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+}
+
+/* ---------- Wajah (sedikit miring seperti referensi) ---------- */
+.face {
+  position: absolute;
+  inset: 0;
+}
+.brow.l {
+  clip-path: inset(0 50% 0 0);
+  translate: -36px 0;
+}
+.brow.r {
+  clip-path: inset(0 0 0 50%);
+  translate: 36px 0;
+}
+.brow {
+  left: 273px;
+  top: 285px;
+  width: 330px;
+  transform: rotate(3deg);
+  animation: brow 1.55s ease-in-out infinite;
+}
+@keyframes brow {
+  0%,
+  100% {
+    transform: rotate(3deg) translateY(0);
+  }
+  50% {
+    transform: rotate(3deg) translateY(-8px);
+  }
+}
+/* Satu gambar mata dipakai dua kali (dipotong kiri/kanan) agar jarak antar mata bisa diatur */
+.eyes.l {
+  clip-path: inset(0 50% 0 0);
+  translate: -34px 0;
+}
+.eyes.r {
+  clip-path: inset(0 0 0 50%);
+  translate: 34px 0;
+}
+.eyes {
+  left: 263px;
+  top: 333px;
+  width: 310px;
+  transform: rotate(4deg);
+  transform-origin: 50% 55%;
+  transition: transform 70ms ease-in;
+}
+.blink .eyes {
+  transform: rotate(4deg) scaleY(0.08);
+}
+.cheek.l {
+  clip-path: inset(0 50% 0 0);
+  translate: -35px 0;
+}
+.cheek.r {
+  clip-path: inset(0 0 0 50%);
+  translate: 35px 0;
+}
+.cheek {
+  left: 216px;
+  top: 452px;
+  width: 390px;
+  transform: rotate(3deg);
+}
+.mouth {
+  left: 322px;
+  top: 425px;
+  width: 165px;
+  transform-origin: 50% 15%;
+  animation: talk 0.775s ease-in-out infinite;
+}
+@keyframes talk {
+  0%,
+  100% {
+    transform: rotate(2deg) scale(1, 1);
+  }
+  50% {
+    transform: rotate(2deg) scale(1.04, 0.82);
+  }
+}
+
+/* ---------- Tangan kanan Bubum (kiri layar): tinju diangkat, "semangat!" ---------- */
+.fist {
+  left: 8px;
+  top: 245px;
+  width: 245px;
+  transform-origin: 85% 85%;
+  animation: pump 1.55s ease-in-out infinite;
+}
+@keyframes pump {
+  0%,
+  100% {
+    transform: rotate(0) translateY(0);
+  }
+  20% {
+    transform: rotate(-10deg) translateY(-14px);
+  }
+  40% {
+    transform: rotate(0) translateY(0);
+  }
+  60% {
+    transform: rotate(-10deg) translateY(-14px);
+  }
+  80% {
+    transform: rotate(0) translateY(0);
+  }
+}
+
+/* ---------- Tangan kiri Bubum (kanan layar): ayun mengikuti langkah ---------- */
+.hand-r {
+  left: 685px;
+  top: 460px;
+  width: 300px;
+  transform-origin: 10% 20%;
+  animation: swing 1.55s ease-in-out infinite;
+}
+@keyframes swing {
+  0%,
+  100% {
+    transform: rotate(-42deg);
+  }
+  50% {
+    transform: rotate(-32deg);
+  }
+}
+
+/* ---------- Tanda seru: berdenyut seirama tinju ---------- */
+.alert {
+  left: 52px;
+  top: 16px;
+  width: 233px;
+  transform-origin: 100% 100%;
+  animation: alert 1.55s ease-out infinite;
+}
+@keyframes alert {
+  0%,
+  40%,
+  80%,
+  100% {
+    transform: scale(1);
+  }
+  20%,
+  60% {
+    transform: scale(1.1);
+  }
+}

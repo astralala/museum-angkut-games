@@ -1,186 +1,88 @@
 <!doctype html>
 <html lang="id">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bubum Menyapa</title>
-<style>
-  html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; }
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bubum Menyapa</title>
+    <link rel="stylesheet" href="css/menyapa.css" />
+  </head>
+  <body>
+    <div class="stage" id="stage">
+      <div class="part leg-l" style="inset: 0; left: 0; top: 0; transform-origin: 400px 1000px">
+        <img
+          style="left: 195px; top: 995px; transform: scale(1.3) rotate(-8deg)"
+          src="assets/_0003_kaki-kanan.png"
+          alt=""
+        />
+      </div>
+      <div class="part leg-r" style="inset: 0; left: 0; top: 0; transform-origin: 640px 1000px">
+        <img
+          style="left: 585px; top: 995px; transform: scale(1.3) rotate(8deg)"
+          src="assets/_0002_kaki-kiri.png"
+          alt=""
+        />
+      </div>
 
-  /* Stage memakai koordinat gambar referensi (1120 x 1404) */
-  .stage {
-    position: absolute; left: 0; top: 0; width: 1120px; height: 1404px;
-    transform-origin: 0 0;
-  }
-  /* Tabung kaki (tidak ada di layer, digambar dengan SVG) */
-  .tubes { position: absolute; inset: 0; overflow: visible; }
-  .tube-out { fill: none; stroke: #0d1b22; stroke-linecap: round; }
-  .tube-in  { fill: none; stroke: #0aa7ab; stroke-linecap: round; }
-  .tube-hi  { fill: none; stroke: #5fe0da; stroke-linecap: round; opacity: .5; }
-  .stage img { position: absolute; display: block; user-select: none; pointer-events: none; }
-  .part { position: absolute; }
+      <div class="upper">
+        <img class="hand-wave" src="assets/_0000_tangan-kiri.png" alt="" />
 
-  /* Overlay referensi untuk mencocokkan posisi: buka dengan ?ref */
-  .stage .ref { left: 0; top: 0; width: 1120px; opacity: .35; z-index: 99; display: none; }
-  .stage.show-ref .ref { display: block; }
-  .show-ref * { animation-play-state: paused !important; }
+        <div class="part globe"><img src="assets/_0011_badan.png" alt="Bubum" /></div>
 
-  /* ---------- Kaki ---------- */
-  .leg-l { width: 1120px; height: 1404px; animation: legL 3.1s ease-in-out infinite; }
-  .leg-r { width: 1120px; height: 1404px; animation: legR 3.1s ease-in-out infinite; }
-  @keyframes legL { 0%,100% { transform: rotate(0deg); } 50% { transform: rotate(-4deg) translateY(-5px); } }
-  @keyframes legR { 0%,100% { transform: rotate(3deg) translateY(-5px); } 50% { transform: rotate(-1deg); } }
+        <div class="sprout">
+          <img class="stem" src="assets/_0008_batang-daun.png" alt="" />
+          <img class="leaf-l" src="assets/_0009_daun-kanan.png" alt="" />
+          <img class="leaf-r" src="assets/_0007_daun-kiri.png" alt="" />
+        </div>
 
-  /* ---------- Badan atas: naik-turun ---------- */
-  .upper {
-    position: absolute; inset: 0;
-    transform-origin: 512px 1080px;
-    animation: bob 1.55s ease-in-out infinite;
-  }
-  @keyframes bob {
-    0%,100% { transform: translateY(0) scale(1, 1) rotate(-0.8deg); }
-    50%     { transform: translateY(-14px) scale(0.985, 1.015) rotate(0.8deg); }
-  }
+        <div class="face" id="face">
+          <div class="crop cheek cheek-l"><img src="assets/_0010_pipi.png" alt="" /></div>
+          <div class="crop cheek cheek-r"><img src="assets/_0010_pipi.png" alt="" /></div>
+          <div class="crop brow brow-l"><img src="assets/_0006_alis.png" alt="" /></div>
+          <div class="crop brow brow-r"><img src="assets/_0006_alis.png" alt="" /></div>
+          <div class="crop eye eye-l"><img src="assets/_0005_mata.png" alt="" /></div>
+          <div class="crop eye eye-r"><img src="assets/_0005_mata.png" alt="" /></div>
+          <img class="mouth" src="assets/_0004_mulut.png" alt="" />
+        </div>
 
-  /* Bola bumi: diambil dari _0011_badan.png lalu dipotong lingkaran */
-  .globe {
-    left: 112px; top: 288px; width: 800px; height: 800px;
-    border-radius: 50%; overflow: hidden;
-  }
-  .globe img { width: 2109px; left: -105px; top: -307px; }
-
-  /* Tunas */
-  .stem   { left: 478px; top: 227px; }
-  .sprout { position: absolute; inset: 0; transform-origin: 530px 330px; animation: sprout 3.1s ease-in-out infinite; }
-  .leaf-l { left: 243px; top: 75px; transform-origin: 290px 190px; animation: leafL 3.1s ease-in-out infinite; }
-  .leaf-r { left: 553px; top: 75px; transform-origin: 20px 190px;  animation: leafR 3.1s ease-in-out infinite; }
-  @keyframes sprout { 0%,100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
-  @keyframes leafL  { 0%,100% { transform: rotate(0deg); } 50% { transform: rotate(-6deg); } }
-  @keyframes leafR  { 0%,100% { transform: rotate(-4deg); } 50% { transform: rotate(3deg); } }
-
-  /* ---------- Wajah ---------- */
-  .face { position: absolute; inset: 0; animation: look 10s ease-in-out infinite; }
-  @keyframes look {
-    0%,40%,100% { transform: translate(0,0); }
-    50%,70%     { transform: translate(8px,-3px); }
-    80%,90%     { transform: translate(-6px,0); }
-  }
-  /* Layer alis/mata/pipi berisi kiri+kanan; dipotong jadi dua agar bisa diposisikan sendiri-sendiri */
-  .crop { position: absolute; overflow: hidden; }
-  .crop img { top: 0; }
-
-  .brow { width: 169px; height: 93px; transform-origin: 57px 46px; animation: brow 3.1s ease-in-out infinite; }
-  .brow-l { left: 345px; top: 463px; }
-  .brow-r { left: 601px; top: 438px; }
-  .brow-r img { left: -169px; }
-  @keyframes brow {
-    0%,100% { transform: scale(1.1) translateY(0); }
-    50%     { transform: scale(1.1) translateY(-8px); }
-  }
-
-  .eye { width: 169px; height: 136px; transform-origin: 57px 64px; transform: scale(1.1); transition: transform 70ms ease-in; }
-  .eye-l { left: 371px; top: 562px; }
-  .eye-r { left: 622px; top: 536px; transform-origin: 111px 64px; }
-  .eye-r img { left: -169px; }
-  .blink .eye { transform: scale(1.1, 0.08); }
-
-  .cheek { width: 223px; height: 147px; }
-  .cheek-l { left: 317px; top: 684px; }
-  .cheek-r { left: 704px; top: 638px; }
-  .cheek-r img { left: -223px; }
-
-  .mouth { left: 496px; top: 672px; width: 196px; transform-origin: 50% 15%; animation: talk 1.55s ease-in-out infinite; }
-  @keyframes talk {
-    0%,100% { transform: rotate(-4deg) scale(1, 1); }
-    25%     { transform: rotate(-4deg) scale(0.94, 0.72); }
-    50%     { transform: rotate(-4deg) scale(1.04, 1.08); }
-    75%     { transform: rotate(-4deg) scale(0.94, 0.72); }
-  }
-
-  /* ---------- Tangan kiri Bubum (kanan layar): melambai dari bahu ---------- */
-  .hand-wave {
-    left: 790px; top: 378px;
-    transform-origin: 40px 340px;
-    animation: wave 1.55s ease-in-out infinite;
-  }
-  @keyframes wave {
-    0%,100% { transform: rotate(-10deg); }
-    50%     { transform: rotate(12deg); }
-  }
-
-  /* ---------- Tangan kanan Bubum (kiri layar): kepalan bergerak santai ---------- */
-  .hand-fist {
-    left: -10px; top: 655px;
-    transform-origin: 270px 160px;
-    animation: fist 3.1s ease-in-out infinite;
-  }
-  @keyframes fist {
-    0%,100% { transform: rotate(-4deg); }
-    50%     { transform: rotate(5deg) translateY(-8px); }
-  }
-</style>
-</head>
-<body>
-<div class="stage" id="stage">
-  <div class="part leg-l" style="inset:0;left:0;top:0;transform-origin:400px 1000px">
-    <img style="left:195px;top:995px;transform:scale(1.3) rotate(-8deg)" src="assets/_0003_kaki-kanan.png" alt="">
-  </div>
-  <div class="part leg-r" style="inset:0;left:0;top:0;transform-origin:640px 1000px">
-    <img style="left:585px;top:995px;transform:scale(1.3) rotate(8deg)" src="assets/_0002_kaki-kiri.png" alt="">
-  </div>
-
-  <div class="upper">
-    <img class="hand-wave" src="assets/_0000_tangan-kiri.png" alt="">
-
-    <div class="part globe"><img src="assets/_0011_badan.png" alt="Bubum"></div>
-
-    <div class="sprout">
-      <img class="stem" src="assets/_0008_batang-daun.png" alt="">
-      <img class="leaf-l" src="assets/_0009_daun-kanan.png" alt="">
-      <img class="leaf-r" src="assets/_0007_daun-kiri.png" alt="">
+        <img class="hand-fist" src="assets/_0001_tangan-kanan.png" alt="" />
+      </div>
     </div>
 
-    <div class="face" id="face">
-      <div class="crop cheek cheek-l"><img src="assets/_0010_pipi.png" alt=""></div>
-      <div class="crop cheek cheek-r"><img src="assets/_0010_pipi.png" alt=""></div>
-      <div class="crop brow brow-l"><img src="assets/_0006_alis.png" alt=""></div>
-      <div class="crop brow brow-r"><img src="assets/_0006_alis.png" alt=""></div>
-      <div class="crop eye eye-l"><img src="assets/_0005_mata.png" alt=""></div>
-      <div class="crop eye eye-r"><img src="assets/_0005_mata.png" alt=""></div>
-      <img class="mouth" src="assets/_0004_mulut.png" alt="">
-    </div>
+    <script>
+      const stage = document.getElementById("stage");
+      if (location.search.includes("ref")) stage.classList.add("show-ref");
 
-    <img class="hand-fist" src="assets/_0001_tangan-kanan.png" alt="">
-  </div>
-</div>
+      // Skala stage agar pas layar
+      function fit() {
+        const s = Math.min(innerWidth / 1120, innerHeight / 1404) * 0.86;
+        const x = (innerWidth - 1120 * s) / 2,
+          y = (innerHeight - 1404 * s) / 2;
+        stage.style.transform = `translate(${x}px, ${y}px) scale(${s})`;
+      }
+      addEventListener("resize", fit);
+      fit();
 
-<script>
-  const stage = document.getElementById('stage');
-  if (location.search.includes('ref')) stage.classList.add('show-ref');
-
-  // Skala stage agar pas layar
-  function fit() {
-    const s = Math.min(innerWidth / 1120, innerHeight / 1404) * 0.86;
-    const x = (innerWidth - 1120 * s) / 2, y = (innerHeight - 1404 * s) / 2;
-    stage.style.transform = `translate(${x}px, ${y}px) scale(${s})`;
-  }
-  addEventListener('resize', fit); fit();
-
-  // Kedipan natural: jeda acak 2–5 dtk, kadang kedip dua kali
-  const face = document.getElementById('face');
-  function blinkOnce(done) {
-    face.classList.add('blink');
-    setTimeout(() => { face.classList.remove('blink'); done && done(); }, 120);
-  }
-  function scheduleBlink() {
-    setTimeout(() => {
-      blinkOnce(() => {
-        if (Math.random() < 0.25) setTimeout(() => blinkOnce(scheduleBlink), 160);
-        else scheduleBlink();
-      });
-    }, 2000 + Math.random() * 3000);
-  }
-  scheduleBlink();
-</script>
-</body>
+      // Kedipan natural: jeda acak 2–5 dtk, kadang kedip dua kali
+      const face = document.getElementById("face");
+      function blinkOnce(done) {
+        face.classList.add("blink");
+        setTimeout(() => {
+          face.classList.remove("blink");
+          done && done();
+        }, 120);
+      }
+      function scheduleBlink() {
+        setTimeout(
+          () => {
+            blinkOnce(() => {
+              if (Math.random() < 0.25) setTimeout(() => blinkOnce(scheduleBlink), 160);
+              else scheduleBlink();
+            });
+          },
+          2000 + Math.random() * 3000,
+        );
+      }
+      scheduleBlink();
+    </script>
+  </body>
 </html>

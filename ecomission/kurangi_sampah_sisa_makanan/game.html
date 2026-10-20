@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kurangi Food Waste - Main</title>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/game.css" />
+    <link rel="stylesheet" href="css/loading.css" />
+    <script src="../bgm.js"></script>
+  </head>
+  <body class="loading">
+    <div id="st" class="stage">
+      <div class="hang card" id="lvbox">
+        <h3>Level <span id="lv">1</span></h3>
+        <div class="dots">
+          <span class="dot" id="d1">1</span><span class="line" id="l1"></span> <span class="dot" id="d2">2</span
+          ><span class="line" id="l2"></span>
+          <span class="dot" id="d3">3</span>
+        </div>
+      </div>
+      <div id="timer">⏱ <span id="tm">30</span> dtk</div>
+
+      <div class="hang wood" id="scbox">
+        <i style="left: 12px; top: 12px"></i><i style="right: 12px; top: 12px"></i>
+        <i style="left: 12px; bottom: 12px"></i><i style="right: 12px; bottom: 12px"></i>
+        <h3>Score</h3>
+        <div class="big" id="sc">0</div>
+      </div>
+
+      <div class="hang card" id="leftbx">
+        <h3>Item Left</h3>
+        <div class="big" id="left">5</div>
+      </div>
+
+      <div class="bin" id="bf"><img src="assets/tong_0000_tong-hijau.png" alt="" /></div>
+      <div class="bin" id="bp"><img src="assets/tong_0001_tong-merah.png" alt="" /></div>
+      <div class="bin" id="bk"><img src="assets/tong_0002_tong-kuning.png" alt="" /></div>
+
+      <div class="ov" id="ov"><div id="ovt"></div></div>
+      <div id="veil"></div>
+    </div>
+
+    <script src="common.js"></script>
+
+    <script src="../sheet-local.js"></script>
+
+    <script>
+      // Scaling responsif: jaga rasio 16:9, muat di layar berapa pun resolusinya
+      function fit() {
+        const s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+        document.documentElement.style.setProperty("--scale", s);
+      }
+      window.addEventListener("resize", fit);
+      fit();
+
+      // Item: [emoji, nama, tempat sampah]  f = Food Waste, p = Plastic & Cans, k = Paper (Kertas)
+      const POOL = [
+        ["🍎", "Sisa apel", "f"],
+        ["🍌", "Kulit pisang", "f"],
+        ["🥚", "Cangkang telur", "f"],
+        ["☕", "Ampas kopi", "f"],
+        ["🍞", "Roti sisa", "f"],
+        ["🥕", "Sisa wortel", "f"],
+        ["🥬", "Sayur layu", "f"],
+        ["🍅", "Tomat busuk", "f"],
+        ["🍉", "Kulit semangka", "f"],
+        ["🧀", "Keju basi", "f"],
+        ["🍚", "Nasi sisa", "f"],
+        ["🫑", "Paprika busuk", "f"],
+        ["🦴", "Tulang", "f"],
+        ["🐟", "Duri ikan", "f"],
+        ["🧴", "Botol plastik", "p"],
+        ["🥤", "Gelas plastik", "p"],
+        ["🥫", "Kaleng", "p"],
+        ["🛍️", "Kantong plastik", "p"],
+        ["📦", "Kardus", "k"],
+        ["📰", "Koran", "k"],
+        ["🧻", "Tisu", "k"],
+        ["🥡", "Kotak makan", "k"],
+        ["📄", "Kertas", "k"],
+      ];
+      const T_START = Date.now();
+      const SIZES = [6, 10, 15],
+        TIMES = [20, 25, 30],
+        st = $("st"); // jumlah item & detik per level
+      const TIMER_OFF = false; // true = timer berhenti (untuk cek tata letak)
+      let level = S.get("level", 1),
+        score = S.get("score", 0),
+        left = 0,
+        time = TIMES[0],
+        timer,
+        done = false;
+      const bins = { f: $("bf"), p: $("bp"), k: $("bk") };
+
+      function setScore(d) {
+        score += d;
+        $("sc").textContent = score;
+        S.set("score", score);
+      }
+      function banner(t, cb, ms = 1500) {
+        $("ovt").textContent = t;
+        $("ov").style.display = "grid";
+        setTimeout(() => {
+          $("ov").style.display = "none";
+          cb && cb();
+        }, ms);
+      }
+      function showLevel() {
+        $("lv").textContent = level;
+        [1, 2, 3].forEach((i) => {
+          $("d" + i).className = "dot" + (i < level ? " done" : i === level ? " on" : "");
+          if (i < 3) $("l" + i).className = "line" + (i < level ? " done" : "");
+        });
+      }
+      function showTime() {
+        $("tm").textContent = time;
+        $("timer").classList.toggle("hurry", time <= 5);
+      }
+
+      function startLevel() {
+        done = false;
+        time = TIMES[level - 1];
+        showTime();
+        showLevel();
+        $("sc").textContent = score;
+        document.querySelectorAll(".item").forEach((e) => e.remove());
+        const n = SIZES[level - 1],
+          picks = [...POOL].sort(() => Math.random() - 0.5).slice(0, n);
+        left = n;
+        $("left").textContent = left;
+        // Susun item di permukaan meja (y ±480–745px, meja makin lebar ke bawah):
+        // selalu 2 baris berselang-seling, ukuran gambar mengecil kalau item banyak
+        // level 1 (≤6 item): satu baris berjajar
+        const cols = n <= 6 ? n : Math.ceil(n / 2),
+          sz = n <= 6 ? 230 : n <= 10 ? 220 : 200;
+        st.style.setProperty("--sz", sz + "px");
+        picks.forEach((p, i) => {
+          const r = i < cols ? 0 : 1,
+            c = r ? i - cols : i,
+            nc = r ? n - cols : cols,
+            el = document.createElement("div");
+          el.className = "item";
+          // gambar assets/sampah/<nama-file>.png; kalau belum ada, kembali ke emoji
+          const file = p[1].toLowerCase().replace(/\s+/g, "-");
+          el.innerHTML = `<span><img src="assets/sampah/${file}.png" alt="${p[1]}"></span><small>${p[1]}</small>`;
+          el.querySelector("img").onerror = function () {
+            this.parentNode.textContent = p[0];
+          };
+          el.dataset.b = p[2];
+          // baris atas x 330–1590px, baris bawah 250–1670px (dalam tepi meja)
+          // baris bawah digeser setengah langkah supaya tidak menumpuk tepat di bawah baris atas
+          const one = cols === n;
+          const x0 = one ? 200 : r ? 140 : 210,
+            x1 = one ? 1720 : r ? 1780 : 1710,
+            step = (x1 - x0) / nc;
+          const off = !one && nc === cols ? (r ? 0.75 : 0.25) : 0.5;
+          const x = x0 + step * (c + off) + (Math.random() * 16 - 8);
+          // baris bawah: dasar gambar tetap di atas tepi depan meja (±745px)
+          const y = one ? 580 : r ? 720 - sz / 2 : 510;
+          el.style.left = x / 19.2 + "%";
+          el.style.top = y / 10.8 + "%";
+          el._home = [el.style.left, el.style.top];
+          drag(el);
+          st.append(el);
+        });
+        banner(
+          "Level " + level,
+          () => {
+            clearInterval(timer);
+            timer = setInterval(() => {
+              if (TIMER_OFF) return;
+              time--;
+              showTime();
+              if (time > 0 && time <= 5) SFX.tick();
+              if (time <= 0) endLevel();
+            }, 1000);
+          },
+          1100,
+        );
+      }
+
+      function drag(el) {
+        el.onpointerdown = (e) => {
+          if (done || $("ov").style.display == "grid") return;
+          SFX.pick();
+          el.setPointerCapture(e.pointerId);
+          el.classList.add("drag");
+          move(e);
+        };
+        el.onpointermove = (e) => {
+          if (el.classList.contains("drag")) {
+            move(e);
+            Object.values(bins).forEach((b) => b.classList.toggle("hot", hit(b, e)));
+          }
+        };
+        el.onpointerup = (e) => {
+          if (!el.classList.contains("drag")) return;
+          el.classList.remove("drag");
+          Object.values(bins).forEach((b) => b.classList.remove("hot"));
+          const key = Object.keys(bins).find((k) => hit(bins[k], e));
+          if (key) drop(el, key, e);
+          else back(el);
+        };
+        function move(e) {
+          const r = st.getBoundingClientRect();
+          el.style.left = ((e.clientX - r.left) / r.width) * 100 + "%";
+          el.style.top = ((e.clientY - r.top) / r.height) * 100 + "%";
+        }
+      }
+      function hit(b, e) {
+        const r = b.getBoundingClientRect();
+        return e.clientX > r.left && e.clientX < r.right && e.clientY > r.top && e.clientY < r.bottom;
+      }
+      function back(el) {
+        el.style.left = el._home[0];
+        el.style.top = el._home[1];
+      }
+      function flash(b, cls) {
+        b.classList.add(cls);
+        setTimeout(() => b.classList.remove(cls), 800);
+      }
+      function pop(txt, color, e) {
+        const r = st.getBoundingClientRect(),
+          f = document.createElement("div");
+        f.className = "fl";
+        f.textContent = txt;
+        f.style.color = color;
+        f.style.left = ((e.clientX - r.left) / r.width) * 100 + "%";
+        f.style.top = ((e.clientY - r.top) / r.height) * 100 - 8 + "%";
+        st.append(f);
+        setTimeout(() => f.remove(), 900);
+      }
+      function drop(el, key, e) {
+        if (el.dataset.b === key) {
+          SFX.ok();
+          setScore(1);
+          flash(bins[key], "ok");
+          pop("+1", "#1b9e2c", e);
+          el.remove();
+          left--;
+          $("left").textContent = left;
+          if (left <= 0) endLevel();
+        } else {
+          SFX.bad();
+          setScore(-1);
+          flash(bins[key], "bad");
+          pop("-1", "#d32f2f", e);
+          back(el);
+          el.classList.add("shake");
+          setTimeout(() => el.classList.remove("shake"), 400);
+        }
+      }
+      function endLevel() {
+        if (done) return;
+        done = true;
+        clearInterval(timer);
+        left <= 0 ? SFX.level() : SFX.timeup();
+        if (level < 3) {
+          level++;
+          S.set("level", level);
+          banner(left <= 0 ? "Level selesai!" : "Waktu habis!", startLevel, 1400);
+        } else banner("Selesai!", finish, 1400);
+      }
+      function finish() {
+        const name = S.get("name", "Pemain");
+        let lb = [];
+        try {
+          lb = JSON.parse(localStorage.getItem(LB) || "[]");
+        } catch {}
+        const t = Date.now();
+        lb.push({ n: name, s: score, t });
+        lb.sort((a, b) => b.s - a.s || a.t - b.t);
+        localStorage.setItem(LB, JSON.stringify(lb.slice(0, 20)));
+        S.set("last", { n: name, s: score, t });
+        catatMain({
+          misi: "Kurangi Sampah Sisa Makanan",
+          nama: name,
+          skor: score,
+          waktu: Math.round((t - T_START) / 1000),
+          hasil: "3 level selesai",
+        });
+        location.href = "ending.html";
+      }
+      pageReady.then(startLevel); // level & timer baru mulai setelah layar kaca buram terbuka
+    </script>
+  </body>
+</html>

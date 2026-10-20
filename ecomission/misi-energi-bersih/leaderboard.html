@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Leaderboard</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/leaderboard.css" />
+    <script src="../bgm.js"></script>
+  </head>
+  <body>
+    <div class="stage center-page">
+      <div class="panel">
+        <h1>🏆 Leaderboard</h1>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nama</th>
+              <th>Waktu</th>
+            </tr>
+          </thead>
+          <tbody id="b"></tbody>
+        </table>
+        <button class="btn" onclick="clickGo('index.html')">🏠 Home</button>
+      </div>
+    </div>
+    <script src="common.js"></script>
+    <script src="../sfx.js"></script>
+    <script>
+      const me = +sessionStorage.getItem("misiEnergi_stamp") || 0,
+        l = getLB().slice(0, 10),
+        b = document.getElementById("b");
+      b.innerHTML = l.length
+        ? l
+            .map(
+              (e, i) =>
+                `<tr class="${e.stamp == me ? "me" : ""}"><td>${i + 1}${["🥇", "🥈", "🥉"][i] || ""}</td><td>${e.name.replace(/</g, "&lt;")}</td><td>${fmt(e.time)}</td></tr>`,
+            )
+            .join("")
+        : '<tr><td colspan="3">Belum ada data.</td></tr>';
+    </script>
+  </body>
+</html>

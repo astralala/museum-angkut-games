@@ -27,5 +27,6 @@ function clickSfx() {
 }
 function clickGo(url) {
   clickSfx();
-  setTimeout(() => { location.href = url; }, 150);
+  if (window.bgmGo) bgmGo(url);   // musik latar turun dulu (lebih lama dari bunyi tombol), lalu pindah
+  else setTimeout(() => { location.href = url; }, 150);
 }

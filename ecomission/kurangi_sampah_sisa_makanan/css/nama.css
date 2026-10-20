@@ -1,0 +1,319 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+  font-family: "Baloo 2", "Trebuchet MS", sans-serif;
+  color: #4a2a0c;
+}
+button {
+  font: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Stage 1920x1080, di-scale agar selalu 16:9 dan muat di layar (HD, 2K, 4K) */
+#stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: center center;
+  transform: translate(-50%, -50%) scale(var(--scale, 1));
+  background: url("../assets/bg_play.png") center / cover no-repeat;
+  overflow: hidden;
+  user-select: none;
+  container-type: size; /* tombol suara dari common.js memakai satuan cqw */
+}
+
+/* ---------- Judul bergaya halaman depan ---------- */
+/* Judul + panel disusun di tengah layar secara vertikal */
+.center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 34px;
+}
+.title {
+  text-align: center;
+  font-size: 100px;
+  font-weight: 800;
+  line-height: 1;
+  animation: titleWobble 4s ease-in-out infinite;
+}
+.title span {
+  color: #8be04a;
+  -webkit-text-stroke: 16px #1f4d12;
+  paint-order: stroke fill;
+  text-shadow:
+    0 9px 0 #1f4d12,
+    0 16px 24px rgba(0, 0, 0, 0.3);
+}
+.title span.o {
+  color: #ffb21f;
+  -webkit-text-stroke-color: #6b2f05;
+  text-shadow:
+    0 9px 0 #6b2f05,
+    0 16px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Papan kayu subjudul */
+.sign {
+  position: absolute;
+  left: 50%;
+  top: 132px;
+  transform: translateX(-50%);
+  padding: 4px 50px;
+  background: linear-gradient(#f6d8a4, #e8b875);
+  border: 6px solid #9a5f2a;
+  border-radius: 22px;
+  box-shadow:
+    0 7px 0 #7a4519,
+    0 12px 20px rgba(0, 0, 0, 0.25);
+  font-size: 32px;
+  font-weight: 700;
+  color: #4a2a0c;
+  white-space: nowrap;
+}
+.sign::before,
+.sign::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  margin-top: -7px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff, #9aa3ab);
+}
+.sign::before {
+  left: 16px;
+}
+.sign::after {
+  right: 16px;
+}
+
+/* ---------- Panel kaca hangat ---------- */
+.panel {
+  width: 1320px;
+  padding: 32px 50px 44px;
+  border-radius: 48px;
+  background: linear-gradient(160deg, rgba(255, 250, 238, 0.82), rgba(255, 240, 214, 0.7));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 5px solid rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 22px 50px rgba(70, 35, 5, 0.35),
+    inset 0 2px 0 #fff;
+  text-align: center;
+}
+
+#f {
+  margin: 0 auto;
+  width: 860px;
+  height: 116px;
+  border-radius: 30px;
+  background: #fff;
+  border: 6px solid #3da32d;
+  box-shadow:
+    inset 0 5px 10px rgba(0, 0, 0, 0.08),
+    0 7px 0 #1f6a19;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 68px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #3a2108;
+}
+#f.empty {
+  color: #b9a68e;
+  font-weight: 600;
+}
+#err {
+  height: 40px;
+  margin-top: 10px;
+  font-size: 30px;
+  font-weight: 800;
+  color: #c62828;
+}
+
+/* ---------- Keyboard ---------- */
+.kb {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.row {
+  display: flex;
+  gap: 12px;
+}
+.key {
+  width: 98px;
+  height: 88px;
+  border: 0;
+  border-radius: 22px;
+  background: linear-gradient(#ffffff 0%, #fff6e6 100%);
+  box-shadow:
+    0 7px 0 #e0b27a,
+    0 12px 16px rgba(90, 50, 10, 0.18),
+    inset 0 -4px 0 rgba(224, 178, 122, 0.35);
+  font-size: 44px;
+  font-weight: 800;
+  color: #4a2a0c;
+  cursor: pointer;
+  transition:
+    transform 0.08s,
+    box-shadow 0.08s,
+    background 0.15s;
+}
+.key:active {
+  transform: translateY(6px);
+  box-shadow: 0 1px 0 #e0b27a;
+  background: #ffe7b8;
+}
+/* Baris berwarna seperti sayuran di halaman depan */
+.row:nth-child(1) .key:not(.w):not(.sp) {
+  box-shadow:
+    0 7px 0 #7cc152,
+    0 12px 16px rgba(30, 80, 10, 0.18);
+  color: #2b6a14;
+}
+.row:nth-child(2) .key:not(.w):not(.sp) {
+  box-shadow:
+    0 7px 0 #f0a640,
+    0 12px 16px rgba(90, 50, 10, 0.18);
+  color: #8a4a06;
+}
+.row:nth-child(3) .key:not(.w):not(.sp) {
+  box-shadow:
+    0 7px 0 #ef7a6a,
+    0 12px 16px rgba(110, 30, 20, 0.18);
+  color: #a8321f;
+}
+.key.w {
+  width: 170px;
+  font-size: 36px;
+  color: #fff;
+  background: linear-gradient(#ffb04a, #f08a10);
+  box-shadow:
+    0 7px 0 #b25a00,
+    0 12px 16px rgba(90, 50, 10, 0.22);
+}
+.key.sp {
+  width: 520px;
+  font-size: 36px;
+  letter-spacing: 4px;
+  color: #2b6a14;
+  background: linear-gradient(#ffffff, #eefbe6);
+  box-shadow:
+    0 7px 0 #7cc152,
+    0 12px 16px rgba(30, 80, 10, 0.18);
+}
+
+/* ---------- Tombol (bentuk sama seperti PLAY di halaman depan) ---------- */
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 30px;
+}
+.pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  width: 330px;
+  height: 90px;
+  border-radius: 999px;
+  font-size: 40px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.pill:active {
+  transform: translateY(6px);
+}
+.pill .tri {
+  width: 0;
+  height: 0;
+  border-top: 20px solid transparent;
+  border-bottom: 20px solid transparent;
+}
+#go {
+  border: 7px solid #1f6a19;
+  background: linear-gradient(#9be86a 0%, #4cbf33 45%, #2f9a24 100%);
+  box-shadow:
+    0 10px 0 #1f6a19,
+    0 18px 26px rgba(0, 0, 0, 0.3),
+    inset 0 5px 0 rgba(255, 255, 255, 0.55);
+  color: #fff;
+  -webkit-text-stroke: 3px #1f6a19;
+  paint-order: stroke fill;
+  text-shadow: 0 4px 0 #1f6a19;
+  animation: pulse 1.6s ease-in-out infinite;
+}
+#go .tri {
+  border-left: 30px solid #fff;
+  filter: drop-shadow(0 3px 0 #1f6a19);
+}
+#back {
+  border: 7px solid #1f6a19;
+  background: rgba(255, 255, 255, 0.35);
+  box-shadow:
+    0 10px 0 rgba(31, 106, 25, 0.6),
+    0 18px 26px rgba(0, 0, 0, 0.18),
+    inset 0 5px 0 rgba(255, 255, 255, 0.6);
+  color: #1f6a19;
+}
+#back .tri {
+  border-right: 30px solid #1f6a19;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+@keyframes titleWobble {
+  0%,
+  100% {
+    transform: scale(1) rotate(0);
+  }
+  30% {
+    transform: scale(1.03) rotate(0);
+  }
+  60% {
+    transform: scale(1) rotate(0);
+  }
+  66% {
+    transform: rotate(-2deg);
+  }
+  72% {
+    transform: rotate(2deg);
+  }
+  78% {
+    transform: rotate(-1.5deg);
+  }
+  84% {
+    transform: rotate(1deg);
+  }
+  90% {
+    transform: rotate(0);
+  }
+}

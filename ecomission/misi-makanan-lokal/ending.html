@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hasil Pilihan Makananmu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script src="sfx.js"></script>
+    <link rel="stylesheet" href="css/ending.css" />
+    <script src="../bgm.js"></script>
+  </head>
+  <body class="loading">
+    <div id="stage">
+      <img id="heading" src="assets/makananpilihan.png" alt="Makanan Pilihanmu - Ini piring makananmu!" />
+
+      <img id="bubble-img" alt="" />
+      <div id="maskot"></div>
+
+      <div id="plate"><img class="base" src="assets/lokal_0024_piring.png" alt="" /></div>
+      <div id="tags"></div>
+
+      <section class="list">
+        <h2>Makanan Pilihanmu</h2>
+        <div id="rows"></div>
+      </section>
+
+      <section class="meter">
+        <img class="truck-big" src="assets/lokal_0023_mobilicon.png" alt="" />
+        <h3>Meter Jarak Transportasi</h3>
+        <div id="total"></div>
+        <div class="bar"><img class="truck" id="truck" src="assets/lokal_0022_barmobilkecil.png" alt="" /></div>
+        <div class="scale">
+          <span class="c-low" style="left: 19%">0 – 45 km<small>(Rendah)</small></span>
+          <span class="c-mid" style="left: 57%">46 – 500 km<small>(Sedang)</small></span>
+          <span class="c-high" style="left: 88%">&gt; 500 km<small>(Tinggi)</small></span>
+        </div>
+      </section>
+
+      <button class="btn" id="next" aria-label="Continue"></button>
+      <div id="veil"></div>
+    </div>
+
+    <script src="data.js"></script>
+    <script>
+      // Scaling responsif: jaga rasio 16:9, muat di layar berapa pun resolusinya
+      function fit() {
+        const s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+        document.documentElement.style.setProperty("--scale", s);
+      }
+      window.addEventListener("resize", fit);
+      fit();
+
+      const h = JSON.parse(sessionStorage.getItem("mml_hasil") || "null");
+      if (!h) location.replace("index.html");
+
+      const good = h.total <= THRESHOLD;
+      const fmt = (n) => n.toLocaleString("id-ID") + " km";
+      const kmClass = (km) => (km <= 45 ? "c-low" : km <= THRESHOLD ? "c-mid" : "c-high");
+      document.getElementById("stage").classList.add(good ? "good" : "bad");
+
+      // Gelembung pesan sesuai hasil
+      Object.assign(
+        document.getElementById("bubble-img"),
+        good
+          ? {
+              src: "assets/titlehebat.png",
+              alt: "Hebat! Kamu memilih makanan yang jejak karbonnya sangat rendah! Terus pilih makanan lokal untuk bumi yang lebih hijau!",
+            }
+          : {
+              src: "assets/jarakjauh.png",
+              alt: "Wah! Jaraknya jauh sekali! Jejak karbon dari makanan kita sangat tinggi. Sebaiknya kita pilih makanan yang jejak karbonnya rendah.",
+            },
+      );
+      // Bubum animasi: menyapa saat good ending, sedih saat bad ending (rig di ../bubum/)
+      document.getElementById("maskot").innerHTML =
+        `<iframe src="../bubum/${good ? "menyapa" : "sedih"}.html" title="Maskot Bubum" scrolling="no" allowtransparency="true"></iframe>`;
+
+      // Piring, label, dan daftar makanan (urut sesuai kategori)
+      const picks = CATS.map((c) => h.picks.find((f) => f.cat === c.id)).filter(Boolean);
+      const plate = document.getElementById("plate"),
+        tags = document.getElementById("tags"),
+        rows = document.getElementById("rows");
+      // Posisi area kategori relatif terhadap gambar piring (sama dengan di gameplay)
+      const AREA = { karbo: [173, 76], sayur: [348, 77], protein: [166, 253], lengkap: [347, 252] };
+      // Gambar daging sapi lokal di piring sudah dipotong (tanpa ruang kosong kiri 8px)
+      const AREA_FIX = { "daging-lokal": { dx: 8 } };
+      picks.forEach((f, i) => {
+        const c = CATS.find((x) => x.id === f.cat),
+          [ax, ay] = AREA[f.cat],
+          fix = AREA_FIX[f.id];
+        // Gambar diambil dari data.js (data di sessionStorage dari versi lama bisa belum punya gambar)
+        const fimg = FOODS.find((x) => x.id === f.id) || f;
+        plate.insertAdjacentHTML(
+          "beforeend",
+          `<img src="${fimg.plate}" alt="${f.name}" style="left:${ax + (fix ? fix.dx : 0)}px;top:${ay}px">`,
+        ); // ukuran asli gambar, sama seperti di gameplay
+        tags.insertAdjacentHTML(
+          "beforeend",
+          `<div class="tag" id="tag-${i}"><img class="e" src="${fimg.img}" alt="${f.name}"><div><strong class="${kmClass(f.km)}">${fmt(f.km)}</strong></div></div>`,
+        );
+        rows.insertAdjacentHTML(
+          "beforeend",
+          `<div class="row"><span class="e" style="background:${c.color}"><img src="${fimg.img}" alt=""></span><span class="n">${f.name}<small>${f.flag} ${f.origin}</small></span><span class="k ${kmClass(f.km)}">${fmt(f.km)}</span></div>`,
+        );
+      });
+
+      // Meter: truk berjalan ke posisi total jarak
+      const tot = document.getElementById("total");
+      tot.textContent = "Total: " + fmt(h.total);
+      tot.className = kmClass(h.total);
+      // `load` menunggu semua gambar dan iframe Bubum; baru setelah itu buka kaca buram,
+      // jalankan mobil di meter, dan putar suara hasil
+      window.addEventListener("load", () => {
+        document.body.classList.remove("loading");
+        setTimeout(() => {
+          // Jaga mobil (lebar 62px) tetap di dalam bar: titik tengahnya bergerak dari 31px sampai (lebar bar - 31px)
+          document.getElementById("truck").style.left = `calc(${barPos(h.total) / 100} * (100% - 62px) + 31px)`;
+        }, 600);
+        setTimeout(() => (good ? SFX.win() : SFX.lose()), 600);
+      });
+      document.getElementById("next").onclick = () => {
+        goTo("finish.html");
+      };
+    </script>
+  </body>
+</html>

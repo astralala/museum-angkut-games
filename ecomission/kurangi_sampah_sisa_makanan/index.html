@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kurangi Sampah Sisa Makanan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/index.css" />
+    <link rel="stylesheet" href="css/loading.css" />
+    <script src="../bgm.js"></script>
+  </head>
+  <body class="loading">
+    <div id="stage" class="stage">
+      <video id="bgvideo" src="assets/bg_video.mp4" autoplay muted loop playsinline></video>
+      <img
+        id="title"
+        src="assets/title_home.png"
+        alt="Kurangi Sampah Sisa Makanan - Makanan Berharga, Masa Depan Lebih Cerah"
+      />
+
+      <div class="note">Good Food Better Tomorrow 🙂</div>
+      <div class="chalk">
+        <p>Masak<br />&nbsp;Secukupnya</p>
+        <p>Makan<br />&nbsp;Sampai Habis</p>
+        <p>Bumi Lebih Sehat</p>
+        <p class="smile">☺</p>
+      </div>
+      <button id="play" class="btn" aria-label="Play"></button>
+      <div id="veil"></div>
+    </div>
+
+    <script src="common.js"></script>
+    <script>
+      // Scaling responsif: jaga rasio 16:9, muat di layar berapa pun resolusinya
+      function fit() {
+        const s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+        document.documentElement.style.setProperty("--scale", s);
+      }
+      window.addEventListener("resize", fit);
+      fit();
+
+      document.getElementById("play").addEventListener("click", () => {
+        goTo("nama.html");
+      });
+    </script>
+  </body>
+</html>

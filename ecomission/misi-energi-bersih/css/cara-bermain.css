@@ -1,0 +1,141 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+}
+
+/* Stage 1920x1080, di-scale agar selalu 16:9 dan muat di layar. Posisi mengikuti assets/how_to_play.png */
+#stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: center center;
+  transform: translate(-50%, -50%) scale(var(--scale, 1));
+  background: url("../assets/scene_after.png") 0 0 / 1920px 1080px no-repeat;
+  overflow: hidden;
+  user-select: none;
+}
+#stage img,
+#bubum {
+  position: absolute;
+  pointer-events: none;
+}
+
+/* Judul dari assets/title_cara_main.png (2172x724, transparan) */
+#title {
+  left: 447px;
+  top: 14px;
+  width: 1036px;
+}
+/* 5 panel langkah dari assets/panel_cara_bermain.png (2172x724, transparan) */
+/* Gambar panel dipakai 5x, tiap salinan dipotong ke satu kartu agar bisa muncul satu per satu */
+.panel {
+  left: 128px;
+  top: 330px;
+  width: 1650px;
+  opacity: 0;
+  animation: panelIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+.p1 {
+  clip-path: inset(0 79.8% 0 0);
+  transform-origin: 10% 60%;
+  animation-delay: 0.3s;
+}
+.p2 {
+  clip-path: inset(0 60% 0 20.2%);
+  transform-origin: 30% 60%;
+  animation-delay: 0.7s;
+}
+.p3 {
+  clip-path: inset(0 40.8% 0 40%);
+  transform-origin: 50% 60%;
+  animation-delay: 1.1s;
+}
+.p4 {
+  clip-path: inset(0 21% 0 59.2%);
+  transform-origin: 69% 60%;
+  animation-delay: 1.5s;
+}
+.p5 {
+  clip-path: inset(0 0 0 79%);
+  transform-origin: 89% 60%;
+  animation-delay: 1.9s;
+}
+@keyframes panelIn {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Tombol PLAY dari assets/btn_play.png (sama seperti index.html), di tengah */
+#play {
+  position: absolute;
+  left: 708px;
+  top: 877px;
+  width: 510px;
+  height: 170px;
+  border: none;
+  padding: 0;
+  background: url("../assets/btn_play.png") center / contain no-repeat;
+  cursor: pointer;
+  animation: pulse 1.6s ease-in-out infinite;
+  -webkit-tap-highlight-color: transparent;
+}
+#play:active {
+  transform: scale(0.97);
+  animation: none;
+}
+#play:focus-visible {
+  outline: 4px solid #ffd23f;
+  border-radius: 90px;
+}
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+/* Bubum Misi Bersih (animasi dari ../bubum/misibersih.html) di kiri bawah */
+#bubum {
+  left: 20px;
+  top: 800px;
+  width: 400px;
+  height: 436px;
+  border: 0;
+  background: transparent;
+}
+/* Speech bubble dari assets/bubblespech_cara_main.png (1672x941), sumbu di ujung ekor (kiri bawah) */
+#bubble {
+  left: 345px;
+  top: 845px;
+  width: 342px;
+  transform-origin: 7% 82%;
+  animation: pop 3s ease-in-out infinite;
+}
+@keyframes pop {
+  0%,
+  100% {
+    transform: rotate(5deg) scale(1);
+  }
+  50% {
+    transform: rotate(4deg) scale(1.03);
+  }
+}

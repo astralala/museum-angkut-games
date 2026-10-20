@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Gameplay</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/gameplay.css" />
+    <link rel="stylesheet" href="css/loading.css" />
+    <script src="../bgm.js"></script>
+  </head>
+  <body class="loading">
+    <div class="stage" id="st">
+      <video
+        class="layer"
+        id="before"
+        src="assets/pemandangan_before.mp4"
+        poster="assets/scene_before.png"
+        autoplay
+        muted
+        loop
+        playsinline
+      ></video>
+      <video
+        class="layer"
+        id="after"
+        src="assets/pemandangan_after.mp4"
+        poster="assets/scene_after.png"
+        autoplay
+        muted
+        loop
+        playsinline
+      ></video>
+      <img
+        id="ttl"
+        src="assets/title_gameplay.png"
+        alt="Drag &amp; Drop item energi terbarukan ke tempat yang tepat! Ikuti petunjuk untuk memasang energi terbarukan di tempat yang tepat!"
+      />
+      <div id="timer" style="position: absolute" aria-label="Waktu"><div class="val" id="tm">00:00.00</div></div>
+      <div id="score" style="position: absolute" aria-label="Skor Kamu"><div class="val" id="sc">0</div></div>
+      <iframe id="mascot" src="../bubum/misibersih.html" title="Bubum" scrolling="no" allowtransparency="true"></iframe>
+      <div id="zones"></div>
+      <div id="msg"></div>
+      <div id="trayWrap" aria-label="Item untuk Diseret"><div id="tray"></div></div>
+      <div id="veil"></div>
+    </div>
+    <script src="common.js"></script>
+    <script src="../sheet-local.js"></script>
+    <script>
+      // x,y,w,h = kotak drop (%), cx,cy,r = pusat & radius area yang jadi bersih (%)
+      const ITEMS = [
+        {
+          id: "solar",
+          ic: "elemen_0000_panellistrik.png",
+          nm: "Panel Surya",
+          pt: 20,
+          lbl: "Pasang panel surya di sini",
+          x: 28.5,
+          y: 45,
+          w: 11.5,
+          h: 10,
+          cx: 34,
+          cy: 53,
+          r: 12,
+        },
+        {
+          id: "angin",
+          ic: "elemen_0001_kincirangin.png",
+          nm: "Turbin Angin",
+          pt: 20,
+          lbl: "Pasang kincir angin di sini",
+          x: 76.5,
+          y: 19,
+          w: 13,
+          h: 18,
+          cx: 83,
+          cy: 28,
+          r: 13,
+        },
+        {
+          id: "biogas",
+          ic: "elemen_0002_biogas.png",
+          nm: "Biogas",
+          pt: 20,
+          lbl: "Pasang biogas di sini",
+          x: 87.5,
+          y: 54,
+          w: 10,
+          h: 15,
+          cx: 91,
+          cy: 63,
+          r: 13,
+        },
+        {
+          id: "plta",
+          ic: "elemen_0004_air.png",
+          nm: "PLTA",
+          pt: 20,
+          lbl: "Pasang PLTA di sini",
+          x: 1,
+          y: 46,
+          w: 15,
+          h: 16,
+          cx: 9,
+          cy: 55,
+          r: 15,
+        },
+        {
+          id: "asap",
+          ic: "elemen_0003_asap.png",
+          nm: "Matikan Asap",
+          pt: 20,
+          lbl: "Matikan asap PLTU di sini",
+          x: 44,
+          y: 28,
+          w: 11,
+          h: 12,
+          cx: 50,
+          cy: 30,
+          r: 12,
+        },
+      ];
+      const $ = (id) => document.getElementById(id),
+        st = $("st");
+      // Suara (WebAudio, tanpa file)
+      let ac;
+      const tone = (f, d, t = "sine", v = 0.15, at = 0) => {
+        ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+        const o = ac.createOscillator(),
+          g = ac.createGain(),
+          s = ac.currentTime + at;
+        o.type = t;
+        o.frequency.setValueAtTime(f, s);
+        g.gain.setValueAtTime(v, s);
+        g.gain.exponentialRampToValueAtTime(0.001, s + d);
+        o.connect(g).connect(ac.destination);
+        o.start(s);
+        o.stop(s + d);
+      };
+      const sfx = {
+        pick: () => tone(520, 0.12, "triangle"),
+        ok: () => [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.25, "triangle", 0.18, i * 0.09)),
+        bad: () => {
+          tone(160, 0.25, "sawtooth", 0.12);
+          tone(120, 0.3, "sawtooth", 0.12, 0.1);
+        },
+        win: () => [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, 0.4, "triangle", 0.2, i * 0.12)),
+      };
+      // Mask video "after": satu lingkaran per area (+ satu lingkaran besar di akhir), radiusnya dianimasikan.
+      // r (%) mengikuti satuan clip-path circle() lama: r% × √(w²+h²)/√2 = r × 0.811 cqw untuk layar 16:9.
+      const holes = [
+        ...ITEMS.map((it) => ({ id: it.id, x: it.cx, y: it.cy, to: it.r * 0.811, dur: 1600 })),
+        { id: "all", x: 50, y: 50, to: 150 * 0.811, dur: 2000 },
+      ];
+      holes.forEach((h) => (h.cur = 0));
+      function drawMask() {
+        const m = holes
+          .map((h) => `radial-gradient(circle at ${h.x}% ${h.y}%,#000 ${h.cur}cqw,transparent ${h.cur + 0.05}cqw)`)
+          .join(",");
+        $("after").style.webkitMaskImage = m;
+        $("after").style.maskImage = m;
+      }
+      function reveal(id) {
+        const h = holes.find((h) => h.id == id),
+          t0 = performance.now();
+        (function step(now) {
+          const p = Math.min(1, (now - t0) / h.dur);
+          h.cur = h.to * (1 - Math.pow(1 - p, 3));
+          drawMask();
+          if (p < 1) requestAnimationFrame(step);
+        })(t0);
+      }
+      drawMask();
+      // Bangun zona & item
+      ITEMS.forEach((it) => {
+        const z = document.createElement("div");
+        z.className = "zone";
+        z.id = "z_" + it.id;
+        z.style.cssText = `left:${it.x}%;top:${it.y}%;width:${it.w}%;height:${it.h}%`;
+        $("zones").append(z);
+        const d = document.createElement("div");
+        d.className = "item";
+        d.id = "i_" + it.id;
+        d.innerHTML = `<img src="assets/${it.ic}" alt="" draggable="false">${it.nm}<b>+${it.pt}</b>`;
+        $("tray").append(d);
+        d.addEventListener("pointerdown", (e) => start(e, it, d));
+      });
+      let score = 0,
+        done = 0,
+        t0 = performance.now(),
+        running = false;
+      pageReady.then(() => {
+        t0 = performance.now();
+        running = true;
+      }); // timer mulai setelah layar buram hilang
+      setInterval(() => {
+        if (running) $("tm").textContent = fmt(performance.now() - t0);
+      }, 50);
+      function msg(t) {
+        const m = $("msg");
+        m.textContent = t;
+        m.style.opacity = 1;
+        clearTimeout(m.t);
+        m.t = setTimeout(() => (m.style.opacity = 0), 1200);
+      }
+      function hit(e) {
+        const r = st.getBoundingClientRect();
+        const px = ((e.clientX - r.left) / r.width) * 100,
+          py = ((e.clientY - r.top) / r.height) * 100;
+        return ITEMS.find((z) => px >= z.x && px <= z.x + z.w && py >= z.y && py <= z.y + z.h);
+      }
+      function start(e, it, el) {
+        e.preventDefault();
+        sfx.pick();
+        el.setPointerCapture(e.pointerId);
+        const g = document.createElement("div");
+        g.className = "ghost";
+        g.innerHTML = `<img src="assets/${it.ic}" alt="">`;
+        document.body.append(g);
+        const mv = (ev) => {
+          g.style.left = ev.clientX + "px";
+          g.style.top = ev.clientY + "px";
+          const h = hit(ev);
+          ITEMS.forEach((z) => $("z_" + z.id).classList.toggle("hover", h && z.id == h.id));
+        };
+        mv(e);
+        const up = (ev) => {
+          el.removeEventListener("pointermove", mv);
+          el.removeEventListener("pointerup", up);
+          g.remove();
+          ITEMS.forEach((z) => $("z_" + z.id).classList.remove("hover"));
+          const h = hit(ev);
+          if (!h) return;
+          if (h.id == it.id) ok(it, el);
+          else {
+            sfx.bad();
+            score -= 20;
+            $("sc").textContent = score;
+            msg("Belum tepat! -20");
+          }
+        }; // salah pasang: skor -20 (boleh minus)
+        el.addEventListener("pointermove", mv);
+        el.addEventListener("pointerup", up);
+      }
+      function ok(it, el) {
+        sfx.ok();
+        el.classList.add("used");
+        $("z_" + it.id).classList.add("done");
+        reveal(it.id);
+        score += it.pt;
+        $("sc").textContent = score;
+        msg("Bagus! +" + it.pt);
+        if (++done == ITEMS.length) finish();
+      }
+      function finish() {
+        running = false;
+        const time = performance.now() - t0;
+        setTimeout(() => st.classList.add("finished"), 1200); // biarkan pesan "Bagus!" terlihat sebentar, lalu sembunyikan semua UI
+        reveal("all");
+        setTimeout(sfx.win, 500);
+        const stamp = Date.now();
+        saveLB({ name: sessionStorage.getItem(KEY_NAME) || "Pemain", time, stamp });
+        catatMain({
+          misi: "Misi Energi Bersih",
+          nama: sessionStorage.getItem(KEY_NAME),
+          skor: score,
+          waktu: Math.round(time / 100) / 10,
+          hasil: "Selesai " + fmt(time),
+        });
+        sessionStorage.setItem("misiEnergi_time", time);
+        sessionStorage.setItem("misiEnergi_score", score);
+        sessionStorage.setItem("misiEnergi_stamp", stamp);
+        setTimeout(() => (location.href = "ending.html"), 1200 + 4800);
+      } // setelah UI hilang, video "after" diam tampil penuh 4,8 detik (total 6 detik sejak selesai), lalu ke ending
+    </script>
+  </body>
+</html>

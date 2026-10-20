@@ -1,0 +1,109 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+}
+
+/* Stage 1920x1080, di-scale agar selalu 16:9 dan muat di layar (HD, 2K, 4K) */
+#stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: center center;
+  transform: translate(-50%, -50%) scale(var(--scale, 1));
+  background: url("../assets/bg-home2.png") 0 0 / 1920px 1080px no-repeat; /* tampil selama video dimuat */
+  overflow: hidden;
+  user-select: none;
+  container-type: size; /* tombol suara dari common.js memakai satuan cqw */
+}
+
+/* Tombol PLAY dari gambar assets/btn_play.png (2172x724, ada ruang transparan di sekeliling),
+     ukuran bagian tombolnya sama dengan tombol lama (±545x174) dan berada di posisi yang sama */
+#play {
+  position: absolute;
+  left: 626px;
+  top: 735px;
+  width: 667px;
+  height: 222px;
+  border: none;
+  padding: 0;
+  background: url("../assets/btn_play.png") center / contain no-repeat;
+  cursor: pointer;
+  animation: pulse 1.6s ease-in-out infinite;
+  -webkit-tap-highlight-color: transparent;
+}
+#play:active {
+  transform: scale(0.97);
+  animation: none;
+}
+
+/* Latar video (assets/bg_video.mp4, 1920x1080, diputar berulang tanpa suara) */
+#bgvideo {
+  position: absolute;
+  inset: 0;
+  width: 1920px;
+  height: 1080px;
+  object-fit: cover;
+  pointer-events: none;
+}
+/* Judul dari gambar assets/title_home.png (1672x941, transparan), di tengah di atas tombol PLAY */
+#title {
+  position: absolute;
+  left: 419px;
+  top: 149px;
+  width: 1057px;
+}
+
+/* Catatan di kulkas (sama seperti di ending.html) */
+.note {
+  position: absolute;
+  left: 34px;
+  top: 312px;
+  width: 150px;
+  font-family: "Patrick Hand", cursive;
+  font-size: 34px;
+  line-height: 1.05;
+  color: #2b2b2b;
+  text-align: center;
+  transform: rotate(-6deg);
+}
+/* Tulisan kapur di papan tulis */
+.chalk {
+  position: absolute;
+  left: 1668px;
+  top: 125px;
+  width: 225px;
+  font-family: "Patrick Hand", cursive;
+  font-size: 34px;
+  line-height: 1.1;
+  color: #f2f2ea;
+  text-shadow: 0 0 2px rgba(255, 255, 255, 0.35);
+  transform: rotate(-4deg);
+}
+.chalk p {
+  margin-bottom: 14px;
+}
+.chalk .smile {
+  text-align: center;
+  font-size: 44px;
+  margin: 0;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}

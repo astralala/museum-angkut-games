@@ -1,0 +1,257 @@
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: transparent;
+  overflow: hidden;
+}
+
+/* Stage memakai koordinat gambar referensi (751 x 904) */
+.stage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 751px;
+  height: 904px;
+  transform-origin: 0 0;
+}
+.stage img {
+  position: absolute;
+  display: block;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Overlay referensi untuk mencocokkan posisi: buka dengan ?ref */
+.stage .ref {
+  left: 0;
+  top: 0;
+  width: 751px;
+  opacity: 0.35;
+  z-index: 99;
+  display: none;
+}
+.stage.show-ref .ref {
+  display: block;
+}
+.show-ref * {
+  animation-play-state: paused !important;
+}
+
+/* ---------- Kaki: menapak, goyang kecil ---------- */
+.leg-l {
+  left: 15px;
+  top: 610px;
+  transform-origin: 70% 10%;
+  animation: legL 3.1s ease-in-out infinite;
+}
+.leg-r {
+  left: 280px;
+  top: 595px;
+  transform-origin: 30% 10%;
+  animation: legR 3.1s ease-in-out infinite;
+}
+@keyframes legL {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  50% {
+    transform: rotate(2deg) translateY(-3px);
+  }
+}
+@keyframes legR {
+  0%,
+  100% {
+    transform: rotate(0) translateY(-3px);
+  }
+  50% {
+    transform: rotate(-2deg);
+  }
+}
+
+/* ---------- Badan atas: naik-turun ---------- */
+.upper {
+  position: absolute;
+  inset: 0;
+  transform-origin: 280px 690px;
+  animation: bob 1.55s ease-in-out infinite;
+}
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
+  50% {
+    transform: translateY(-8px) scale(0.99, 1.01);
+  }
+}
+
+.body {
+  left: 5px;
+  top: 150px;
+}
+.leaf {
+  left: 48px;
+  top: -5px;
+  transform-origin: 50% 95%;
+  animation: leaf 3.1s ease-in-out infinite;
+}
+@keyframes leaf {
+  0%,
+  100% {
+    transform: rotate(-3deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
+}
+
+/* ---------- Wajah ---------- */
+.face {
+  position: absolute;
+  inset: 0;
+  animation: look 9s ease-in-out infinite;
+}
+/* Sesekali melirik ke arah yang ditunjuk (kanan atas) */
+@keyframes look {
+  0%,
+  30%,
+  100% {
+    transform: translate(0, 0);
+  }
+  40%,
+  60% {
+    transform: translate(7px, -4px);
+  }
+}
+.brow {
+  left: 160px;
+  top: 280px;
+  transform: rotate(-6deg);
+  animation: brow 3.1s ease-in-out infinite;
+}
+@keyframes brow {
+  0%,
+  100% {
+    transform: rotate(-6deg) translateY(0);
+  }
+  50% {
+    transform: rotate(-6deg) translateY(-7px);
+  }
+}
+.eyes {
+  left: 157px;
+  top: 318px;
+  transform: rotate(-6deg);
+  transform-origin: 50% 55%;
+  transition: transform 70ms ease-in;
+}
+.blink .eyes {
+  transform: rotate(-6deg) scaleY(0.08);
+}
+.cheek {
+  left: 160px;
+  top: 420px;
+  transform: rotate(-8deg);
+}
+/* Mulut bicara memberi info */
+.mouth {
+  left: 250px;
+  top: 412px;
+  transform-origin: 50% 20%;
+  animation: talk 1.55s ease-in-out infinite;
+}
+@keyframes talk {
+  0%,
+  100% {
+    transform: rotate(-5deg) scale(1, 1);
+  }
+  25% {
+    transform: rotate(-5deg) scale(0.94, 0.75);
+  }
+  50% {
+    transform: rotate(-5deg) scale(1, 1.02);
+  }
+  75% {
+    transform: rotate(-5deg) scale(0.94, 0.75);
+  }
+}
+
+/* ---------- Tangan kiri Bubum (kanan layar): menunjuk ke kanan atas, "tuk-tuk" ---------- */
+.hand-point {
+  left: 500px;
+  top: 225px;
+  transform-origin: 40px 140px;
+  animation: point 1.55s ease-in-out infinite;
+}
+@keyframes point {
+  0%,
+  100% {
+    transform: rotate(0) translate(0, 0);
+  }
+  20% {
+    transform: rotate(-4deg) translate(8px, -5px);
+  }
+  35% {
+    transform: rotate(0) translate(0, 0);
+  }
+  55% {
+    transform: rotate(-4deg) translate(8px, -5px);
+  }
+  70% {
+    transform: rotate(0) translate(0, 0);
+  }
+}
+
+/* ---------- Tangan kanan Bubum (kiri layar): jempol, ayun santai ---------- */
+.hand-thumb {
+  left: 8px;
+  top: 430px;
+  transform-origin: 42px 20px;
+  animation: thumb 3.1s ease-in-out infinite;
+}
+@keyframes thumb {
+  0%,
+  100% {
+    transform: rotate(-6deg);
+  }
+  50% {
+    transform: rotate(9deg) translateY(-6px);
+  }
+}
+
+/* ---------- Tanda seru: muncul "pop" berulang seirama tunjukan ---------- */
+.alert {
+  left: 515px;
+  top: 34px;
+  width: 228px;
+  transform-origin: 0% 100%;
+  animation: alert 1.55s ease-out infinite;
+}
+@keyframes alert {
+  0% {
+    opacity: 0.6;
+    transform: scale(0.85);
+  }
+  20% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+  35% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0.6;
+    transform: scale(0.85);
+  }
+}

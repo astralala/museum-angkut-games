@@ -1,0 +1,86 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+html,
+body {
+  height: 100%;
+  background: #000;
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+  overflow: hidden;
+  user-select: none;
+  touch-action: manipulation;
+}
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.stage {
+  position: relative;
+  width: min(100vw, 177.78vh);
+  aspect-ratio: 1672/941;
+  background: center/100% 100% no-repeat;
+  overflow: hidden;
+}
+.hot {
+  position: absolute;
+  border: 0;
+  cursor: pointer;
+  border-radius: 60px;
+  background: transparent;
+  transition: 0.15s;
+}
+.hot:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: scale(1.03);
+}
+.hot:focus-visible {
+  outline: 4px solid #ffd23f;
+}
+.btn {
+  background: linear-gradient(#5fd35f, #1f9a2f);
+  color: #fff;
+  font-weight: 700;
+  font-size: clamp(14px, 2.4vw, 30px);
+  border: 4px solid #fff;
+  border-radius: 50px;
+  padding: 0.5em 1.4em;
+  cursor: pointer;
+  box-shadow: 0 5px 0 #14661f;
+  font-family: inherit;
+}
+.btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 #14661f;
+}
+.panel {
+  background: #fff8e1;
+  border: 6px solid #c98a3d;
+  border-radius: 22px;
+  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.25);
+  padding: 2%;
+  color: #4a2c0a;
+  text-align: center;
+}
+.center-page {
+  background-image: url(../assets/home.png);
+}
+.center-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 60, 30, 0.55);
+}
+.center-page .panel {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 70%;
+  max-height: 92%;
+}
+h1 {
+  font-size: clamp(18px, 3.4vw, 44px);
+  margin-bottom: 0.4em;
+}

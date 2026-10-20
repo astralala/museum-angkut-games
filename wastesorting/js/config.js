@@ -1,0 +1,2 @@
+/* Daftar gambar sampah game Perumahan & kuis. Ganti file di assets/sampah/ (nama sama) atau ubah path di sini. */
+const SPR=["assets/sampah/pisang.png", "assets/sampah/apel.png", "assets/sampah/sayur.png", "assets/sampah/daun.png", "assets/sampah/botol.png", "assets/sampah/kertas.png", "assets/sampah/kardus.png", "assets/sampah/kaleng.png", "assets/sampah/baterai.png", "assets/sampah/bohlam.png", "assets/sampah/kantong.png", "assets/sampah/susu.png"];

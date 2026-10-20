@@ -1,0 +1,305 @@
+/* Scene: video berulang assets/pemandangan_before.mp4 (kota berpolusi) & pemandangan_after.mp4 (kota bersih).
+   Video "after" ada di atas "before" dan hanya terlihat lewat lingkaran-lingkaran mask yang membesar
+   tiap kali item dipasang. Gambar scene_*.png dipakai sebagai poster selama video dimuat. */
+.layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+}
+#after {
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+/* ---- UI papan kayu (mengikuti assets/gameplay.png) ---- */
+#st {
+  container-type: inline-size;
+  font-family: "Fredoka", "Trebuchet MS", sans-serif;
+}
+.zone {
+  position: absolute;
+  border: 0.3cqw dashed #fff;
+  border-radius: 1.2cqw;
+  background: rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  transition: 0.2s;
+  box-shadow: 0 0 1cqw rgba(0, 0, 0, 0.15);
+}
+.zone span {
+  position: absolute;
+  bottom: 100%;
+  margin-bottom: 0.8cqw;
+  background: #fffbea;
+  border-radius: 1cqw;
+  padding: 0.25cqw 1cqw;
+  font-size: 1.15cqw;
+  font-weight: 700;
+  color: #1d3a1a;
+  white-space: nowrap;
+  box-shadow: 0 0.25cqw 0.6cqw rgba(0, 0, 0, 0.25);
+}
+.zone.hover {
+  background: rgba(255, 235, 90, 0.45);
+  transform: scale(1.06);
+}
+.zone.done {
+  opacity: 0;
+  pointer-events: none;
+}
+.wood {
+  background: linear-gradient(#f6c27a, #e39b4a);
+  border: 0.3cqw solid #a8642a;
+  box-shadow:
+    0 0.45cqw 0 #7a4519,
+    0 0.8cqw 1.4cqw rgba(0, 0, 0, 0.3),
+    inset 0 0.2cqw 0 rgba(255, 255, 255, 0.45);
+  color: #3a2108;
+}
+.wood .nail {
+  position: absolute;
+  width: 0.7cqw;
+  height: 0.7cqw;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff, #7d868e);
+}
+/* Judul + petunjuk dari assets/title_gameplay.png (936x317), di tengah atas */
+#ttl {
+  position: absolute;
+  left: 31%;
+  top: 1.5%;
+  width: 38%;
+  pointer-events: none;
+  filter: drop-shadow(0 0.4cqw 0.6cqw rgba(0, 0, 0, 0.25));
+}
+.badge {
+  position: absolute;
+  top: 2.5%;
+  display: flex;
+  align-items: center;
+  gap: 0.8cqw;
+  padding: 0.6cqw 1cqw;
+  border-radius: 1.6cqw;
+  background: linear-gradient(#f2fff4, #c9f1d3);
+  border: 0.3cqw solid #4fd08a;
+  box-shadow:
+    0 0.4cqw 0 #2e9d63,
+    0 0.8cqw 1.4cqw rgba(0, 0, 0, 0.25);
+}
+.badge .ic {
+  font-size: 3.4cqw;
+  line-height: 1;
+  filter: drop-shadow(0 0.2cqw 0.2cqw rgba(0, 0, 0, 0.25));
+}
+.badge .lab {
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.3cqw;
+  color: #173a20;
+  line-height: 1.1;
+}
+.badge .val {
+  margin-top: 0.2cqw;
+  min-width: 9cqw;
+  padding: 0.1cqw 0.8cqw;
+  border-radius: 0.8cqw;
+  background: linear-gradient(#25a046, #137a2f);
+  color: #fff;
+  font-size: 2.4cqw;
+  font-variant-numeric: tabular-nums;
+  box-shadow: inset 0 0.2cqw 0 rgba(255, 255, 255, 0.3);
+}
+/* Kotak Skor dari assets/skor_bg.png (386x179); angka ditaruh di kotak hijau gambar itu */
+#score {
+  right: 1.5%;
+  top: 2%;
+  width: 18cqw;
+  aspect-ratio: 386/179;
+  background: url(../assets/skor_bg.png) center/100% 100% no-repeat;
+}
+#score .val {
+  position: absolute;
+  left: 38%;
+  top: 47%;
+  width: 53%;
+  height: 31%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+  background: none;
+  box-shadow: none;
+  color: #fff;
+  font-weight: 700;
+  font-size: 2.2cqw;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0.15cqw 0.2cqw rgba(0, 0, 0, 0.35);
+}
+/* Kotak Waktu dari assets/time_bg.png (410x199); angka ditaruh di kotak hijau gambar itu */
+#timer {
+  left: 1.5%;
+  top: 2%;
+  width: 19cqw;
+  aspect-ratio: 410/199;
+  background: url(../assets/time_bg.png) center/100% 100% no-repeat;
+}
+#timer .val {
+  position: absolute;
+  left: 40%;
+  top: 50%;
+  width: 51%;
+  height: 30%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+  background: none;
+  box-shadow: none;
+  color: #fff;
+  font-weight: 700;
+  font-size: 2cqw;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0.15cqw 0.2cqw rgba(0, 0, 0, 0.35);
+}
+/* Setelah semua item terpasang: semua UI (judul, waktu, skor, Bubum, zona, item) memudar,
+   tinggal video "after" yang tampil penuh sampai pindah ke ending */
+#st > :not(.layer) {
+  transition: opacity 0.8s ease;
+}
+#st.finished > :not(.layer) {
+  opacity: 0;
+  pointer-events: none;
+}
+/* Bubum Misi Bersih animasi (../bubum/misibersih.html), ukuran & posisi sama seperti di cara-bermain.html:
+   terpotong tepi bawah layar sebatas badan */
+#mascot {
+  position: absolute;
+  left: 0%;
+  top: 65.91%;
+  width: 27%;
+  height: 52.5%;
+  border: 0;
+  background: transparent;
+  pointer-events: none;
+}
+#bubble {
+  position: absolute;
+  left: 14%;
+  top: 67%;
+  width: 12.5%;
+  padding: 1cqw 0.8cqw;
+  border-radius: 50%;
+  background: #fff;
+  border: 0.25cqw solid #1f7a35;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.15cqw;
+  line-height: 1.1;
+  color: #173a20;
+  transform: rotate(-6deg);
+  box-shadow: 0 0.4cqw 1cqw rgba(0, 0, 0, 0.25);
+}
+/* Panel item dari assets/panel_drag.png (1345x337): judul + 5 kotak warna; item ditaruh tepat di atas tiap kotak */
+#trayWrap {
+  position: absolute;
+  left: 23%;
+  top: 72%;
+  width: 54.5%;
+  aspect-ratio: 1345/337;
+  background: url(../assets/panel_drag.png) center/100% 100% no-repeat;
+}
+#tray {
+  position: absolute;
+  left: 2.97%;
+  right: 2.97%;
+  top: 21.4%;
+  bottom: 11%;
+  display: flex;
+  gap: 1.2%;
+  justify-content: center;
+}
+.item {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.3cqw;
+  padding-bottom: 0.6cqw;
+  cursor: grab;
+  touch-action: none;
+  font-weight: 700;
+  font-size: 1.15cqw;
+  color: #1d2a14;
+  border-radius: 1.2cqw;
+  transition:
+    transform 0.2s,
+    opacity 0.3s;
+}
+.item:hover {
+  transform: translateY(-0.5cqw);
+}
+.item:active {
+  cursor: grabbing;
+  transform: scale(0.96);
+}
+/* Ikon item dari assets/elemen_*.png */
+.item img {
+  position: relative;
+  top: 0.16cqw;
+  height: 4.8cqw;
+  max-width: 90%;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 0.3cqw 0.25cqw rgba(0, 0, 0, 0.25));
+}
+.item b {
+  background: linear-gradient(#25a046, #137a2f);
+  color: #fff;
+  border-radius: 999px;
+  padding: 0 1.2cqw;
+  font-size: 1.5cqw;
+  box-shadow: 0 0.2cqw 0 #0c5520;
+}
+.item.used {
+  opacity: 0.35;
+  pointer-events: none;
+  filter: grayscale(1);
+}
+@keyframes bob {
+  50% {
+    transform: translateY(-0.5cqw);
+  }
+}
+.ghost img {
+  display: block;
+  width: clamp(50px, 9vw, 140px);
+}
+.ghost {
+  position: fixed;
+  z-index: 9;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(1.1);
+  filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.4));
+}
+#msg {
+  position: absolute;
+  left: 50%;
+  top: 60%;
+  transform: translate(-50%, 0);
+  font-size: clamp(14px, 2.6vw, 34px);
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 2px 6px #000;
+  opacity: 0;
+  transition: 0.3s;
+  pointer-events: none;
+}

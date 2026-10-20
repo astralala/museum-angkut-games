@@ -1,0 +1,368 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+  font-family: "Fredoka", system-ui, sans-serif;
+  color: #16365a;
+}
+button {
+  font: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Tombol mute dari sfx.js */
+body > .key {
+  border: 0;
+  border-radius: 12px;
+  padding: 6px 10px;
+  font-size: 1.4rem;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 3px 0 #9bb;
+  cursor: pointer;
+}
+
+/* Stage 1920x1080, di-scale agar selalu 16:9 dan muat di layar (HD, 2K, 4K) */
+#stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: center center;
+  transform: translate(-50%, -50%) scale(var(--scale, 1));
+  background: url("../assets/home_bg_misi_makanan_lokal.png") center / cover no-repeat;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* ---------- Judul bergaya game (putih + kuning, outline gelap) ---------- */
+.heading {
+  position: absolute;
+  text-align: center;
+}
+.heading h1 {
+  font-size: 92px;
+  font-weight: 700;
+  line-height: 1;
+  transform: rotate(-3deg);
+  white-space: nowrap;
+}
+.heading h1 span {
+  color: #fff;
+  -webkit-text-stroke: 14px #10324f;
+  paint-order: stroke fill;
+  text-shadow:
+    0 8px 0 #10324f,
+    0 14px 20px rgba(0, 0, 0, 0.25);
+}
+.heading h1 span.y {
+  background: linear-gradient(#fff36a, #ffc61a 60%, #ff9f0a);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-stroke: 0;
+  filter: drop-shadow(0 0 0 #10324f) drop-shadow(6px 0 0 #10324f) drop-shadow(-6px 0 0 #10324f)
+    drop-shadow(0 6px 0 #10324f) drop-shadow(0 -6px 0 #10324f) drop-shadow(0 8px 0 #10324f);
+  text-shadow: none;
+}
+.heading .pill {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 8px 40px;
+  border-radius: 999px;
+  background: #fff;
+  border: 5px solid #4ab3ff;
+  box-shadow: 0 6px 0 #2a86d1;
+  font-size: 30px;
+  font-weight: 600;
+  color: #1d4fa8;
+  transform: rotate(-2deg);
+}
+.heading.green .pill {
+  border-color: #5cd16e;
+  box-shadow: 0 6px 0 #33a447;
+  color: #157a32;
+}
+#h-left {
+  left: 150px;
+  top: 120px;
+  width: 760px;
+}
+#h-right {
+  left: 950px;
+  top: 120px;
+  width: 560px;
+}
+
+/* ---------- Panel kaca biru-putih ---------- */
+.panel {
+  position: absolute;
+  border-radius: 36px;
+  padding: 26px;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.92), rgba(225, 242, 255, 0.88));
+  border: 6px solid #8fd0ff;
+  box-shadow:
+    0 10px 0 #4ea7e8,
+    0 20px 40px rgba(0, 40, 90, 0.25);
+}
+#p-left {
+  left: 150px;
+  top: 330px;
+  width: 760px;
+  height: 650px;
+}
+#p-right {
+  left: 950px;
+  top: 330px;
+  width: 560px;
+  height: 650px;
+}
+
+/* Header berwarna dengan ikon bulat (seperti "Karbohidrat", "Sayuran") */
+.cat {
+  position: relative;
+  height: 74px;
+  margin-left: 34px;
+  padding-left: 70px;
+  border-radius: 0 999px 999px 0;
+  display: flex;
+  align-items: center;
+  font-size: 36px;
+  font-weight: 700;
+  color: #10324f;
+  box-shadow: inset 0 -5px 0 rgba(0, 0, 0, 0.08);
+}
+.cat .ic {
+  position: absolute;
+  left: -34px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 48px;
+  border: 6px solid #fff;
+  box-shadow:
+    0 6px 12px rgba(0, 0, 0, 0.2),
+    inset 0 -6px 0 rgba(0, 0, 0, 0.15);
+}
+.c-red {
+  background: linear-gradient(#ffb3b3, #ff8c8c);
+}
+.c-red .ic {
+  background: radial-gradient(circle at 35% 30%, #ff7a7a, #e0262f);
+}
+.c-green {
+  background: linear-gradient(#c9f5c4, #9fe69a);
+}
+.c-green .ic {
+  background: radial-gradient(circle at 35% 30%, #6fe07a, #1e9a35);
+}
+.c-blue {
+  background: linear-gradient(#cfe9ff, #a6d4ff);
+}
+.c-blue .ic {
+  background: radial-gradient(circle at 35% 30%, #7cc4ff, #1f6fd8);
+}
+.c-orange {
+  background: linear-gradient(#ffe39a, #ffcf5a);
+}
+.c-orange .ic {
+  background: radial-gradient(circle at 35% 30%, #ffc04d, #f07a10);
+}
+
+/* Panel kiri: tujuan */
+.intro {
+  font-size: 32px;
+  font-weight: 600;
+  text-align: center;
+  margin: 4px 0 26px;
+}
+.goals {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding-left: 10px;
+}
+.goal-desc {
+  margin: 10px 0 0 104px;
+  font-size: 26px;
+  font-weight: 500;
+  color: #33506e;
+}
+
+/* Panel kanan: langkah */
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding-left: 8px;
+}
+.step .cat {
+  height: 58px;
+  font-size: 28px;
+  padding-left: 64px;
+  margin-left: 30px;
+}
+.step .cat .ic {
+  width: 76px;
+  height: 76px;
+  left: -30px;
+  font-size: 40px;
+  color: #fff;
+  font-weight: 700;
+}
+.step p {
+  margin: 8px 0 0 84px;
+  font-size: 24px;
+  font-weight: 500;
+  color: #33506e;
+  line-height: 1.25;
+}
+
+/* ---------- Maskot + gelembung + tombol ---------- */
+/* Maskot Bubum animasi (rig di ../bubum/home2.html) */
+#maskot {
+  position: absolute;
+  left: 1399px;
+  top: 475px;
+  width: 522px;
+  height: 612px;
+  border: 0;
+  background: transparent;
+  pointer-events: none;
+}
+/* Gelembung teks: assets/bubble-siap.png */
+.bubble {
+  position: absolute;
+  left: 1520px;
+  top: 285px;
+  width: 380px;
+  pointer-events: none;
+  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.18));
+  animation: wiggle 4s ease-in-out 1s infinite;
+}
+
+#go {
+  position: absolute;
+  left: 1490px;
+  top: 878px;
+  width: 420px;
+  height: 118px;
+  border: 0;
+  padding: 0;
+  background: url("../assets/home_btn_play.png") center / contain no-repeat;
+  cursor: pointer;
+  animation: pulse 1.6s ease-in-out infinite;
+  -webkit-tap-highlight-color: transparent;
+}
+#go:active {
+  transform: scale(0.97);
+  animation: none;
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+@keyframes wiggle {
+  0%,
+  60%,
+  100% {
+    transform: rotate(0);
+  }
+  66% {
+    transform: rotate(-4deg);
+  }
+  72% {
+    transform: rotate(4deg);
+  }
+  78% {
+    transform: rotate(-3deg);
+  }
+  84% {
+    transform: rotate(2deg);
+  }
+  90% {
+    transform: rotate(0);
+  }
+}
+.card-img {
+  position: absolute;
+  top: 110px;
+  height: 860px;
+  filter: drop-shadow(0 16px 26px rgba(0, 40, 90, 0.3));
+  pointer-events: none;
+}
+#img-tujuan {
+  left: 110px;
+}
+#img-cara {
+  left: 858px;
+  top: 129px;
+} /* gambar ini punya ruang kosong lebih besar di bawah; diturunkan agar sama rata */
+
+/* Saat memuat: layar kaca buram (ala iPhone) menutupi stage; animasi ditahan
+     sampai seluruh gambar (termasuk rig Bubum di iframe) selesai dimuat */
+#veil {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  background: rgba(255, 255, 255, 0.18);
+  transition: opacity 0.6s ease;
+}
+body:not(.loading) #veil {
+  opacity: 0;
+  pointer-events: none;
+}
+.loading #stage *,
+.loading #stage {
+  animation-play-state: paused !important;
+}
+/* Semua elemen disembunyikan selama memuat, lalu muncul berurutan:
+     Tujuan Misi → Cara Bermain → tombol Play → Bubum → gelembung paling akhir */
+#stage > :not(#veil) {
+  transition:
+    opacity 0.5s ease,
+    transform 0.15s;
+}
+#stage > #img-cara {
+  transition-delay: 0.5s, 0s;
+}
+#stage > #go {
+  transition-delay: 1s, 0s;
+}
+#stage > #maskot {
+  transition-delay: 1.5s, 0s;
+}
+#stage > .bubble:not(#veil) {
+  transition-delay: 2s, 0s;
+}
+.loading #stage > :not(#veil) {
+  opacity: 0;
+}

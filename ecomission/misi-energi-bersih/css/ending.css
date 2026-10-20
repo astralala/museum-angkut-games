@@ -1,0 +1,191 @@
+.stage {
+  container-type: inline-size;
+  font-family: "Fredoka", "Trebuchet MS", sans-serif;
+}
+/* Nama + waktu: di tengah, tepat di bawah kotak "Congratulations" */
+#t {
+  position: absolute;
+  left: 50%;
+  top: 32.2%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.8cqw;
+  white-space: nowrap;
+  padding: 0.4cqw 1.6cqw 0.4cqw 0.5cqw;
+  border-radius: 999px;
+  background: #fffbea;
+  border: 0.25cqw solid #2e9e3e;
+  box-shadow:
+    0 0.35cqw 0 #1f7a35,
+    0 0.7cqw 1.2cqw rgba(0, 0, 0, 0.25);
+  font-weight: 700;
+  font-size: 1.6cqw;
+  color: #173a20;
+}
+#t .ic {
+  display: grid;
+  place-items: center;
+  width: 2.4cqw;
+  height: 2.4cqw;
+  border-radius: 50%;
+  background: linear-gradient(#5fd35f, #1f9a2f);
+  color: #fff;
+  font-size: 1.3cqw;
+}
+#t .sep {
+  width: 0.25cqw;
+  height: 1.6cqw;
+  background: #9fd4ab;
+  border-radius: 2px;
+}
+#t b {
+  color: #1f7a35;
+  font-variant-numeric: tabular-nums;
+}
+/* Tombol leaderboard: menutup tombol "Back to Home" di gambar */
+.lb {
+  position: absolute;
+  top: 86.6%;
+  height: 11.2%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1cqw;
+  border-radius: 999px;
+  border: 0.35cqw solid #fff;
+  background: linear-gradient(#7be27b, #2fae3f 55%, #1f9a2f);
+  box-shadow:
+    0 0.5cqw 0 #14661f,
+    0 0.9cqw 1.6cqw rgba(0, 0, 0, 0.3),
+    inset 0 0.25cqw 0 rgba(255, 255, 255, 0.55);
+  color: #fff;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 2.1cqw;
+  white-space: nowrap;
+  text-shadow: 0 0.2cqw 0 #14661f;
+  cursor: pointer;
+  animation: pulse 1.6s ease-in-out infinite;
+}
+.lb:active {
+  animation: none;
+  transform: translateY(0.3cqw);
+}
+.lb span {
+  font-size: 2.4cqw;
+}
+#lbBtn {
+  display: none;
+} /* leaderboard disembunyikan sementara */
+/* Home & Play Another: gambar tombol (2172x724, ada ruang transparan di sekeliling), berdampingan di tengah */
+#home,
+#another {
+  top: 84.5%;
+  width: 26%;
+  height: 15.4%;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+  background: center/contain no-repeat;
+  font-size: 0;
+}
+#home {
+  left: 23.5%;
+  background-image: url(../assets/btn_home.png);
+  animation: none;
+}
+#another {
+  left: 50.5%;
+  background-image: url(../assets/btn_playanother.png);
+}
+@keyframes pulse {
+  50% {
+    transform: scale(1.04);
+  }
+}
+/* Skor akhir: kotak assets/skor_bg.png (sama seperti di gameplay) di tengah, di antara nama/waktu dan panel */
+#score {
+  position: absolute;
+  left: calc(50% - 8.5cqw);
+  top: 40.8%;
+  width: 17cqw;
+  aspect-ratio: 386/179;
+  background: url(../assets/skor_bg.png) center/100% 100% no-repeat;
+  animation: scoreIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s both;
+}
+#score b {
+  position: absolute;
+  left: 38%;
+  top: 47%;
+  width: 53%;
+  height: 31%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 2.2cqw;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0.15cqw 0.2cqw rgba(0, 0, 0, 0.35);
+}
+@keyframes scoreIn {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+/* Latar: video berulang assets/pemandangan_after.mp4 (kota bersih), elemen desain dipasang di atasnya */
+#bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+}
+#title {
+  position: absolute;
+  left: 25%;
+  top: 1%;
+  width: 50%;
+  pointer-events: none;
+}
+/* Papan kayu pojok: gambar sudah berisi semak & bunga, ditempel di sudut bawah */
+.corner {
+  position: absolute;
+  bottom: 0;
+  width: 34%;
+  pointer-events: none;
+}
+#signL {
+  left: 0;
+}
+#signR {
+  right: 0;
+}
+/* Panel keterangan (assets/panel tengah.png): di tengah, tepat di atas tombol Home & Play Another */
+#panel {
+  position: absolute;
+  left: 19.3%;
+  top: 54.24%;
+  width: 61.4%;
+  pointer-events: none;
+}
+/* Maskot Bubum animasi menyapa (rig di ../bubum/menyapa.html) */
+/* Bubum di tengah, berdiri di belakang panel panjang (iframe diletakkan sebelum panel di HTML) */
+#maskot {
+  position: absolute;
+  left: 17%;
+  top: 24.7%;
+  width: 27%;
+  height: 57%;
+  border: 0;
+  background: transparent;
+  pointer-events: none;
+}

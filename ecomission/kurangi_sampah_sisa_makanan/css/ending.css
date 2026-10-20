@@ -1,0 +1,287 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+  font-family: "Baloo 2", "Trebuchet MS", sans-serif;
+  color: #4a2a0c;
+}
+button {
+  font: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Stage 1920x1080, di-scale agar selalu 16:9 dan muat di layar (HD, 2K, 4K) */
+#stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: center center;
+  transform: translate(-50%, -50%) scale(var(--scale, 1));
+  background: url("../assets/bg-home2.png") 0 0 / 1920px 1080px no-repeat; /* tampil selama video dimuat */
+  overflow: hidden;
+  user-select: none;
+  container-type: size; /* tombol suara dari common.js memakai satuan cqw */
+}
+
+/* ---------- Judul bergaya halaman depan ---------- */
+.title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 40px;
+  text-align: center;
+  font-weight: 800;
+  line-height: 0.9;
+  animation: titleWobble 4s ease-in-out infinite;
+}
+.title div {
+  white-space: nowrap;
+}
+.t-green {
+  font-size: 130px;
+  color: #8be04a;
+  -webkit-text-stroke: 18px #1f4d12;
+  paint-order: stroke fill;
+  text-shadow:
+    0 10px 0 #1f4d12,
+    0 18px 26px rgba(0, 0, 0, 0.3);
+}
+.t-orange {
+  font-size: 160px;
+  color: #ffb21f;
+  -webkit-text-stroke: 18px #6b2f05;
+  paint-order: stroke fill;
+  text-shadow:
+    0 10px 0 #6b2f05,
+    0 18px 26px rgba(0, 0, 0, 0.3);
+}
+
+/* ---------- Papan kayu (seperti papan di halaman depan) ---------- */
+.sign {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(#f9dfb2, #ebbf80);
+  border: 7px solid #9a5f2a;
+  border-radius: 26px;
+  box-shadow:
+    0 9px 0 #7a4519,
+    0 16px 26px rgba(0, 0, 0, 0.28),
+    inset 0 3px 0 rgba(255, 255, 255, 0.5);
+  text-align: center;
+}
+.sign i {
+  position: absolute;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  margin-top: -8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff, #8d969e);
+}
+.sign i:first-child {
+  left: 18px;
+}
+.sign i:nth-child(2) {
+  right: 18px;
+}
+
+#msg {
+  top: 362px;
+  width: 900px;
+  padding: 12px 60px 16px;
+}
+#msg h2 {
+  font-size: 52px;
+  font-weight: 800;
+  line-height: 1.05;
+  color: #3a2108;
+}
+#msg h2 span {
+  color: #2f8f26;
+}
+.rule {
+  width: 80%;
+  height: 3px;
+  margin: 8px auto;
+  background: #9a5f2a;
+  border-radius: 2px;
+}
+#msg p {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+#score {
+  top: 540px;
+  width: 560px;
+  padding: 14px 40px 26px;
+}
+#score h3 {
+  font-size: 40px;
+  font-weight: 800;
+}
+#sc {
+  margin: 6px auto 0;
+  width: 360px;
+  border-radius: 30px;
+  background: linear-gradient(#8fe060, #3da32d 60%, #2f8f26);
+  border: 6px solid #1f6a19;
+  box-shadow:
+    0 8px 0 #1f6a19,
+    inset 0 5px 0 rgba(255, 255, 255, 0.45);
+  font-size: 150px;
+  font-weight: 800;
+  line-height: 1.05;
+  color: #fff;
+  -webkit-text-stroke: 8px #1f6a19;
+  paint-order: stroke fill;
+  animation: popin 0.6s 0.3s ease-out both;
+}
+
+/* ---------- Tombol Home & Play Another dari gambar (2172x724, ada ruang transparan di sekeliling) ---------- */
+.pill {
+  position: absolute;
+  top: 860px;
+  width: 480px;
+  height: 160px;
+  border: none;
+  padding: 0;
+  background: center / contain no-repeat;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.pill:active {
+  transform: scale(0.97);
+}
+/* Berdampingan di tengah layar (x = 960) */
+#home {
+  left: 470px;
+  background-image: url("../assets/btn_home.png");
+}
+#another {
+  left: 970px;
+  background-image: url("../assets/btn_playanother.png");
+  animation: pulse 1.6s ease-in-out infinite;
+}
+#another:active {
+  animation: none;
+}
+
+/* ---------- Tulisan kapur di papan tulis (leaderboard) ---------- */
+.chalk {
+  position: absolute;
+  left: 1640px;
+  top: 150px;
+  width: 250px;
+  height: 300px;
+  font-family: "Patrick Hand", cursive;
+  color: #f2f2ea;
+  text-shadow: 0 0 2px rgba(255, 255, 255, 0.35);
+  transform: rotate(-2deg);
+}
+.chalk h4 {
+  font-size: 40px;
+  font-weight: 400;
+  text-align: center;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.chalk ol {
+  list-style: none;
+}
+.chalk li {
+  display: flex;
+  justify-content: space-between;
+  font-size: 30px;
+  line-height: 1.25;
+  padding: 0 6px;
+}
+.chalk li span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 160px;
+}
+.chalk li.me {
+  color: #ffe66b;
+}
+.chalk p {
+  text-align: center;
+  font-size: 28px;
+  opacity: 0.8;
+}
+
+/* Catatan di kulkas */
+.note {
+  position: absolute;
+  left: 34px;
+  top: 312px;
+  width: 150px;
+  font-family: "Patrick Hand", cursive;
+  font-size: 34px;
+  line-height: 1.05;
+  color: #2b2b2b;
+  text-align: center;
+  transform: rotate(-6deg);
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+@keyframes popin {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.1);
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes titleWobble {
+  0%,
+  100% {
+    transform: scale(1) rotate(0);
+  }
+  30% {
+    transform: scale(1.03) rotate(0);
+  }
+  60% {
+    transform: scale(1) rotate(0);
+  }
+  66% {
+    transform: rotate(-2deg);
+  }
+  72% {
+    transform: rotate(2deg);
+  }
+  78% {
+    transform: rotate(-1.5deg);
+  }
+  84% {
+    transform: rotate(1deg);
+  }
+  90% {
+    transform: rotate(0);
+  }
+}

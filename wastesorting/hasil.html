@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <title>Hasil</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div id="frame" class="hs blurin">
+      <div class="topblur"></div>
+      <svg class="pa star el" viewBox="0 0 200 160" aria-hidden="true">
+        <g fill="#ffc21a" stroke="#f59e0b" stroke-width="3">
+          <path d="M18 52l30 16-6 10-30-16z" />
+          <path d="M42 18l22 28-9 7-22-28z" />
+          <path d="M182 52l-30 16 6 10 30-16z" />
+          <path d="M158 18l-22 28 9 7 22-28z" />
+        </g>
+        <path
+          d="M100 12l21 43 47 6-34 33 8 47-42-22-42 22 8-47-34-33 47-6z"
+          fill="#ffc21a"
+          stroke="#e8590c"
+          stroke-width="7"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M100 30l13 28 30 4"
+          fill="none"
+          stroke="#fff3b0"
+          stroke-width="8"
+          stroke-linecap="round"
+          opacity=".8"
+        />
+      </svg>
+      <div class="pa gj el" id="gj">Great Job!</div>
+      <div class="pa sub el">
+        <b>Selamat kamu berhasil<br />memilah sampah berdasarkan jenisnya!</b
+        ><small>You've successfully sorted the trash by type!</small>
+      </div>
+
+      <div class="pa sc tot el">
+        <div class="h">Total Score</div>
+        <div class="v">
+          <svg viewBox="0 0 100 100"><use href="#st" /></svg><span id="tot">0</span>
+        </div>
+      </div>
+      <div class="pa sc hi el">
+        <div class="h"><span>👑</span>Hi Score</div>
+        <div class="v">
+          <svg viewBox="0 0 100 100"><use href="#st" /></svg><span id="hi">0</span>
+        </div>
+      </div>
+
+      <div class="pa msg el" id="msg"></div>
+
+      <div class="pa lb el">
+        <div class="h"><span>🏆</span>Today's Leaderboard</div>
+        <ol id="lb"></ol>
+      </div>
+
+      <img
+        class="cap el"
+        src="assets/elements/end-caption.png"
+        alt="Ayo ikut menjaga Bumi kita dengan membuang sampah sesuai dengan tempatnya."
+      />
+      <button class="bt home el" aria-label="Home" onclick="SFX.click();S.reset();goTo('index.html')"></button>
+      <button class="bt again el" aria-label="Play Again" onclick="SFX.click();again()"></button>
+      <img class="qr el" src="assets/btn/btn-end-scanqr.png" alt="Scan di sini untuk tips memilah sampah di rumah" />
+      <video
+        id="intro"
+        src="assets/videos/mobilpulangnew.mp4"
+        poster="assets/bg/bghomenocar.png"
+        muted
+        autoplay
+        playsinline
+        preload="auto"
+      ></video>
+
+      <svg width="0" height="0" style="position: absolute">
+        <defs>
+          <symbol id="st" viewBox="0 0 100 100">
+            <path
+              d="M50 6l13 27 30 4-22 21 5 30-26-14-26 14 5-30-22-21 30-4z"
+              fill="#ffc21a"
+              stroke="#e8590c"
+              stroke-width="5"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M50 18l8 17 18 3"
+              fill="none"
+              stroke="#fff3b0"
+              stroke-width="5"
+              stroke-linecap="round"
+              opacity=".85"
+            />
+          </symbol>
+        </defs>
+      </svg>
+
+      <script>
+        window.CFG = {};
+      </script>
+      <script src="js/common.js"></script>
+      <!-- PILIH SATU: Google Sheets (online) ATAU lokal saja. Remark yang tidak dipakai. -->
+      <!-- <script src="google-sheet/sheet.js"></script> -->
+      <script src="js/sheet-local.js"></script>
+      <script>
+        need("kuis");
+        const $ = (id) => document.getElementById(id);
+        const g = +S.get("skor") || 0,
+          k = +S.get("kuis") || 0,
+          tot = g + k;
+
+        /* simpan ke leaderboard (sekali saja per permainan) */
+        let b = S.board(),
+          me = { nama: S.get("nama"), area: S.get("area"), skor: tot, t: Date.now() };
+        const hiBefore = b.length ? Math.max(...b.map((r) => r.skor)) : null;
+        if (S.get("saved") === null) {
+          b.push(me);
+          S.saveBoard(b);
+          S.set("saved", me.t);
+          /* kirim ke Google Sheets (lewat antrean, aman kalau offline) */
+          SheetQ.add({
+            id: me.t + "-" + PERANGKAT,
+            t: me.t,
+            nama: me.nama,
+            area: { perumahan: "Perumahan", mall: "Pertokoan", bengkel: "Bengkel" }[me.area] || me.area,
+            skor: g,
+            kuis: k,
+            total: tot,
+            waktu: +S.get("waktu") || 0,
+            benar: +S.get("benar") || 0,
+            salah: +S.get("salah") || 0,
+            perangkat: PERANGKAT,
+          });
+        } else me.t = +S.get("saved");
+
+        /* leaderboard hari ini */
+        const d0 = new Date();
+        d0.setHours(0, 0, 0, 0);
+        const today = b.filter((r) => r.t >= d0.getTime()).sort((x, y) => y.skor - x.skor || x.t - y.t);
+        const rank = today.findIndex((r) => r.t === me.t) + 1;
+        const hi = Math.max(...b.map((r) => r.skor));
+
+        $("tot").textContent = tot;
+        $("hi").textContent = hi;
+
+        const lb = $("lb");
+        today.slice(0, 5).forEach((r, n) => {
+          const li = document.createElement("li");
+          if (r.t === me.t) li.className = "me";
+          li.innerHTML =
+            '<span class="rk r' +
+            (n + 1) +
+            '">' +
+            (n + 1) +
+            '</span><span class="nm"></span><svg viewBox="0 0 100 100"><use href="#st"/></svg><span class="pt">' +
+            r.skor +
+            "</span>";
+          li.querySelector(".nm").textContent = r.nama;
+          lb.appendChild(li);
+        });
+
+        /* pesan untuk anak */
+        const avg = today.reduce((s, r) => s + r.skor, 0) / today.length;
+        let m;
+        if (rank > 5) {
+          $("gj").textContent = "Good Try!";
+          m = ["no", "💪", "Yah, belum masuk 5 besar.<br>Ayo coba lagi ya!", "Not in the top 5 yet. Try again!"];
+        } else if (rank === 1 && (hiBefore === null || tot > hiBefore)) {
+          m = ["", "🎉", "Wow! Skormu paling<br>tinggi! Hebat sekali!", "You got the highest score! Amazing!"];
+        } else if (rank === 1) {
+          m = ["", "🥇", "Hore! Kamu juara 1<br>hari ini!", "Hooray! You're number 1 today!"];
+        } else if (today.length > 1 && tot > avg) {
+          m = ["", "📈", "Skormu di atas<br>rata-rata hari ini!", "You're above today's average!"];
+        } else {
+          m = ["", "🏅", "Hebat! Kamu masuk<br>5 besar hari ini!", "Great! You're in today's top 5!"];
+        }
+        $("msg").className = "pa msg el " + m[0];
+        $("msg").innerHTML =
+          '<span class="ic">' + m[1] + "</span><div><b>" + m[2] + "</b><small>" + m[3] + "</small></div>";
+        /* video dulu, lalu elemen muncul satu per satu */
+        const fr = $("frame"),
+          vid = $("intro");
+        let shown = false;
+        [...document.querySelectorAll(".el")].forEach((e, n) => e.style.setProperty("--d", 0.4 + n * 0.18 + "s"));
+        function reveal() {
+          if (shown) return;
+          shown = true;
+          fr.classList.add("go");
+          setTimeout(() => vid.remove(), 1000);
+          setTimeout(() => (rank > 5 ? SFX.lose : SFX.win)(), 700);
+        }
+        /* mobil sudah berhenti di posisi yang sama dengan gambar latar sejak ±3,5 detik,
+   jadi transisi dimulai lebih awal (CUT) tanpa menunggu video habis */
+        const CUT = 4.3;
+        vid.addEventListener("timeupdate", () => {
+          if (vid.currentTime >= CUT) reveal();
+        });
+        vid.addEventListener("ended", reveal);
+        vid.addEventListener("error", reveal);
+        vid.addEventListener("pointerdown", reveal); /* sentuh = lewati */
+        vid.play().catch((e) => {
+          if (e.name === "NotAllowedError") reveal();
+        });
+        document.addEventListener("visibilitychange", () => {
+          if (!document.hidden && !shown) vid.play().catch(() => {});
+        });
+        setTimeout(reveal, 13000);
+
+        /* main lagi: data direset, kembali ke home */
+        function again() {
+          S.reset();
+          goTo("home.html");
+        }
+      </script>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tantangan Selesai</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Patrick+Hand&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/ending.css" />
+    <link rel="stylesheet" href="css/loading.css" />
+    <script src="../bgm.js"></script>
+  </head>
+  <body class="loading">
+    <div id="stage" class="stage">
+      <!-- Latar video yang sama dengan halaman pembuka, diputar berulang tanpa suara -->
+      <video
+        src="assets/bg_video.mp4"
+        autoplay
+        muted
+        loop
+        playsinline
+        style="position: absolute; inset: 0; width: 1920px; height: 1080px; object-fit: cover; pointer-events: none"
+      ></video>
+      <div class="note">Good Food Better Tomorrow 🙂</div>
+
+      <div class="title">
+        <div class="t-green">Tantangan</div>
+        <div class="t-orange">Selesai!</div>
+      </div>
+
+      <div class="sign" id="msg">
+        <i></i><i></i>
+        <h2>Kamu Hebat, <span id="nm">Pemain</span>!</h2>
+        <div class="rule"></div>
+        <p>Terus pilih makanan yang baik untuk bumi kita!</p>
+      </div>
+
+      <div class="sign" id="score">
+        <i></i><i></i>
+        <h3>Nilai Skor Kamu</h3>
+        <div id="sc">0</div>
+      </div>
+
+      <button class="btn pill" id="home" aria-label="Home"></button>
+      <button class="btn pill" id="another" aria-label="Play Another Mission"></button>
+
+      <div class="chalk">
+        <h4>🏆 Top Skor</h4>
+        <ol id="lb"></ol>
+      </div>
+      <div id="veil"></div>
+    </div>
+
+    <script src="common.js"></script>
+    <script>
+      // Scaling responsif: jaga rasio 16:9, muat di layar berapa pun resolusinya
+      function fit() {
+        const s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+        document.documentElement.style.setProperty("--scale", s);
+      }
+      window.addEventListener("resize", fit);
+      fit();
+
+      const last = S.get("last", { n: "Pemain", s: 0, t: 0 });
+      $("nm").textContent = last.n;
+      $("sc").textContent = last.s;
+
+      // Leaderboard ditulis di papan tulis (5 teratas)
+      function renderLB() {
+        let lb = [];
+        try {
+          lb = JSON.parse(localStorage.getItem(LB) || "[]");
+        } catch {}
+        const ol = $("lb");
+        ol.innerHTML = lb.length ? "" : "<p>Belum ada skor</p>";
+        lb.slice(0, 5).forEach((x, i) => {
+          const li = document.createElement("li");
+          if (x.t === last.t) li.className = "me";
+          const a = document.createElement("span"),
+            b = document.createElement("b");
+          a.textContent = i + 1 + ". " + x.n;
+          b.textContent = x.s;
+          li.append(a, b);
+          ol.append(li);
+        });
+      }
+      renderLB();
+      pageReady.then(() => setTimeout(() => SFX.win(), 300));
+
+      $("home").onclick = () => {
+        goTo("../index.html");
+      };
+      $("another").onclick = () => {
+        goTo("../choose_game.html");
+      };
+    </script>
+  </body>
+</html>

@@ -1,0 +1,294 @@
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: transparent;
+  overflow: hidden;
+}
+
+/* Stage memakai koordinat gambar referensi (473 x 709) */
+.stage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 473px;
+  height: 709px;
+  transform-origin: 0 0;
+}
+.stage img {
+  position: absolute;
+  display: block;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Overlay referensi untuk mencocokkan posisi: buka dengan ?ref */
+.stage .ref {
+  left: 0;
+  top: 0;
+  width: 473px;
+  opacity: 0.35;
+  z-index: 99;
+  display: none;
+}
+.stage.show-ref .ref {
+  display: block;
+}
+.show-ref * {
+  animation-play-state: paused !important;
+}
+
+/* ---------- Kaki: gelisah, bergantian geser kecil ---------- */
+.leg-l {
+  left: 65px;
+  top: 492px;
+  transform-origin: 50% 10%;
+  animation: legL 2.4s ease-in-out infinite;
+}
+.leg-r {
+  left: 220px;
+  top: 490px;
+  transform-origin: 50% 10%;
+  animation: legR 2.4s ease-in-out infinite;
+}
+@keyframes legL {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(3deg) translateY(-3px);
+  }
+  50% {
+    transform: rotate(0);
+  }
+}
+@keyframes legR {
+  0%,
+  50%,
+  100% {
+    transform: rotate(0);
+  }
+  75% {
+    transform: rotate(-3deg) translateY(-3px);
+  }
+}
+
+/* ---------- Badan: napas berat + gemetar halus ---------- */
+.upper {
+  position: absolute;
+  inset: 0;
+  transform-origin: 236px 560px;
+  animation: sag 3.2s ease-in-out infinite;
+}
+@keyframes sag {
+  0%,
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
+  50% {
+    transform: translateY(6px) scale(1.012, 0.985);
+  }
+}
+.shiver {
+  position: absolute;
+  inset: 0;
+  animation: shiver 0.18s linear infinite;
+}
+@keyframes shiver {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-0.8px);
+  }
+  75% {
+    transform: translateX(0.8px);
+  }
+}
+
+/* Daun layu: menunduk pelan */
+.leaf {
+  left: 28px;
+  top: 22px;
+  transform-origin: 50% 92%;
+  animation: droop 3.2s ease-in-out infinite;
+}
+@keyframes droop {
+  0%,
+  100% {
+    transform: rotate(-2deg) scaleY(1);
+  }
+  50% {
+    transform: rotate(2deg) scaleY(0.95);
+  }
+}
+.body {
+  left: -2px;
+  top: 160px;
+}
+
+/* ---------- Wajah ---------- */
+.face {
+  position: absolute;
+  inset: 0;
+  animation: glance 4.5s ease-in-out infinite;
+}
+/* Mata melirik ke kiri-kanan dengan cemas */
+@keyframes glance {
+  0%,
+  18%,
+  100% {
+    transform: translate(0, 0);
+  }
+  24%,
+  40% {
+    transform: translate(-6px, 1px);
+  }
+  48%,
+  64% {
+    transform: translate(6px, 1px);
+  }
+  72%,
+  90% {
+    transform: translate(0, 2px);
+  }
+}
+.brow {
+  left: 85px;
+  top: 208px;
+  transform-origin: 50% 100%;
+  animation: worry 3.2s ease-in-out infinite;
+}
+@keyframes worry {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px) scaleX(0.97);
+  }
+}
+.eyes {
+  left: 95px;
+  top: 262px;
+}
+.squeeze {
+  left: 136px;
+  top: 270px;
+  visibility: hidden;
+}
+.blink .eyes {
+  visibility: hidden;
+}
+.blink .squeeze {
+  visibility: visible;
+}
+
+/* Mulut bergetar */
+.mouth {
+  left: 160px;
+  top: 337px;
+  transform-origin: 50% 40%;
+  animation: quiver 0.5s ease-in-out infinite;
+}
+@keyframes quiver {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(0.94, 1.06);
+  }
+}
+
+/* Keringat ala kartun: "pop" muncul di samping kepala (memantul kecil),
+     diam sebentar, lalu meluncur turun pelan sambil memudar. Jeda, ulang. */
+.sweat {
+  left: 372px;
+  top: 145px;
+  transform-origin: 6px 96px;
+  opacity: 0;
+  animation: sweat 3s infinite;
+}
+/* Keringat sisi kiri: gambar yang sama dicerminkan, muncul bersamaan */
+.sweat-l-wrap {
+  position: absolute;
+  left: -52px;
+  top: 155px;
+  width: 99px;
+  height: 98px;
+  transform: scaleX(-1);
+}
+.sweat-l-wrap .sweat {
+  left: 0;
+  top: 0;
+}
+@keyframes sweat {
+  0% {
+    opacity: 0;
+    transform: translate(-4px, 4px) scale(0.3);
+    animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1.2);
+  }
+  10% {
+    opacity: 1;
+    transform: translate(0, 0) scale(0.7, 0.8);
+    animation-timing-function: ease-out;
+  }
+  16% {
+    opacity: 1;
+    transform: translate(0, 0) scale(0.78, 0.72);
+    animation-timing-function: ease-out;
+  }
+  22% {
+    opacity: 1;
+    transform: translate(0, 0) scale(0.75);
+    animation-timing-function: ease-in-out;
+  }
+  50% {
+    opacity: 1;
+    transform: translate(1px, 3px) scale(0.75);
+    animation-timing-function: ease-in;
+  }
+  68% {
+    opacity: 0;
+    transform: translate(3px, 14px) scale(0.72, 0.78);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(3px, 14px) scale(0.72, 0.78);
+  }
+}
+
+/* ---------- Tangan: meremas gelisah di depan badan ---------- */
+.hand-l {
+  left: 8px;
+  top: 352px;
+  transform-origin: 80% 80%;
+  animation: fidgetL 1.6s ease-in-out infinite;
+}
+.hand-r {
+  left: 285px;
+  top: 358px;
+  transform-origin: 92px 33px;
+  animation: fidgetR 1.6s ease-in-out infinite;
+}
+@keyframes fidgetL {
+  0%,
+  100% {
+    transform: rotate(0) translate(0, 0);
+  }
+  50% {
+    transform: rotate(4deg) translate(3px, -4px);
+  }
+}
+@keyframes fidgetR {
+  0%,
+  100% {
+    transform: rotate(0) translate(0, 0);
+  }
+  50% {
+    transform: rotate(-14deg) translate(-3px, 3px);
+  }
+}

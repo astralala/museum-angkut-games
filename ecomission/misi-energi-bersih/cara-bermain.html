@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Cara Bermain</title>
+    <link rel="stylesheet" href="css/cara-bermain.css" />
+    <link rel="stylesheet" href="css/loading.css" />
+    <script src="../bgm.js"></script>
+  </head>
+  <body class="loading">
+    <div id="stage" class="stage">
+      <img id="title" src="assets/title_cara_main.png" alt="Misi Energi Bersih - Cara Bermain" />
+      <!-- Bubum di belakang panel agar daunnya tidak menutupi teks langkah 1 -->
+      <iframe id="bubum" src="../bubum/misibersih.html" title="Bubum" scrolling="no" allowtransparency="true"></iframe>
+      <img class="panel p1" src="assets/panel_cara_bermain.png" alt="1. Drag solar panel ke atas rumah" />
+      <img class="panel p2" src="assets/panel_cara_bermain.png" alt="2. Matikan asap dari turbin PLTU" />
+      <img class="panel p3" src="assets/panel_cara_bermain.png" alt="3. Tambahkan kincir angin" />
+      <img class="panel p4" src="assets/panel_cara_bermain.png" alt="4. Pasang fasilitas biogas di peternakan" />
+      <img class="panel p5" src="assets/panel_cara_bermain.png" alt="5. Buat bendungan air untuk PLTA" />
+      <img
+        id="bubble"
+        src="assets/bubblespech_cara_main.png"
+        alt="Yuk, selesaikan semua langkah untuk kota yang lebih bersih dan sehat!"
+      />
+      <button id="play" aria-label="Play"></button>
+      <div id="veil"></div>
+    </div>
+
+    <script src="common.js"></script>
+    <script src="../sfx.js"></script>
+    <script>
+      function fit() {
+        const s = Math.min(innerWidth / 1920, innerHeight / 1080);
+        document.documentElement.style.setProperty("--scale", s);
+      }
+      addEventListener("resize", fit);
+      fit();
+
+      document.getElementById("play").addEventListener("click", () => clickGo("gameplay.html"));
+    </script>
+  </body>
+</html>

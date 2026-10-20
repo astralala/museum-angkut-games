@@ -1,0 +1,24 @@
+.panel {
+  overflow: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: clamp(12px, 1.9vw, 24px);
+  margin-bottom: 2%;
+}
+th,
+td {
+  padding: 0.35em;
+  border-bottom: 2px dashed #c98a3d;
+}
+th {
+  color: #14661f;
+}
+tr.me {
+  background: #ffe9a8;
+  font-weight: 700;
+}
+td:nth-child(2) {
+  text-align: left;
+}

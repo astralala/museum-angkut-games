@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <title>Kuis</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div id="frame" class="kz blurin">
+      <div class="hud" id="tmb"><img src="assets/elements/timerbar.png" alt="" /><span id="time">00:15</span></div>
+      <div class="hud" id="skb">
+        <img src="assets/elements/skorbar.png" alt="" /><span>Skor: <b id="score">0</b></span>
+      </div>
+      <div class="card">
+        <p class="q" id="q"></p>
+        <p class="qe" id="qe"></p>
+        <div class="pw">
+          <div class="pic"><img id="pic" alt="" /><span id="emo" class="emo"></span></div>
+        </div>
+      </div>
+      <div class="no" id="no"></div>
+      <div id="opts"></div>
+      <div class="foot" id="foot"></div>
+      <script>
+        window.CFG = {};
+      </script>
+      <script src="js/common.js"></script>
+      <script src="js/soal.js"></script>
+      <script src="js/soal-alternatif.js"></script>
+      <script>
+        need("area", "area.html");
+        const NEXT = {
+          perumahan: "pulang-perumahan.html",
+          mall: "pulang-pertokoan.html",
+          bengkel: "pulang-bengkel.html",
+        };
+        const area = S.get("area"),
+          A = AREA[area] || AREA.perumahan,
+          N = Math.min(JUMLAH_SOAL, A.items.length),
+          LIMIT = WAKTU_SOAL,
+          $ = (id) => document.getElementById(id);
+        $("frame").style.backgroundImage = "url(assets/bg/" + A.bg + ".png)";
+        function shuffle(a) {
+          a = [...a];
+          for (let j = a.length - 1; j > 0; j--) {
+            const r = Math.floor(Math.random() * (j + 1));
+            [a[j], a[r]] = [a[r], a[j]];
+          }
+          return a;
+        }
+        /* Soal "ke mana membuang" (js/soal.js) -> format umum; minimal satu dari tiap jenis sampah */
+        function soalSampah(n) {
+          const base = ["o", "a", "b"].map((t) => shuffle(A.items.filter((x) => x[1] === t))[0]);
+          return base
+            .concat(shuffle(A.items.filter((x) => !base.includes(x))).slice(0, Math.max(0, n - 3)))
+            .slice(0, n)
+            .map(([f, t, id, en]) => ({
+              img: "assets/" + A.dir + "/" + f + ".png",
+              q: "Ke mana sebaiknya kita membuang " + id + "?",
+              qe: "Where should we throw the " + en + "?",
+              opts: ["a", "o", "b"].map((k) => ({ bin: BIN[k][0], id: BIN[k][1], en: BIN[k][2], ok: k === t })),
+            }));
+        }
+        /* Soal wawasan (js/soal-alternatif.js) -> format umum; jawaban pertama = benar */
+        function soalAlt() {
+          return SOAL_UMUM.concat(SOAL_AREA[area] || []).map((s) => ({
+            img: s.img,
+            q: s.q,
+            qe: s.qe,
+            opts: s.opsi.map(([id, en], k) => ({ id, en, ok: k === 0 })),
+          }));
+        }
+        const BANK = typeof PAKAI_BANK === "string" ? PAKAI_BANK : "sampah";
+        const pool =
+          BANK === "alternatif"
+            ? soalAlt()
+            : BANK === "campur"
+              ? soalAlt().concat(soalSampah(A.items.length))
+              : soalSampah(N);
+        const pick = shuffle(pool).slice(0, N);
+        let i = 0,
+          sc = 0,
+          lock = false,
+          t0,
+          timer,
+          lastSec;
+        function foot(cls, b, s) {
+          const f = $("foot");
+          f.className = "foot " + (cls || "");
+          f.innerHTML = "<b>" + b + "</b><small>" + s + "</small>";
+        }
+        function show() {
+          const s = pick[i];
+          lock = false;
+          $("no").innerHTML = "Question <b>" + (i + 1) + "</b> of " + N;
+          $("q").textContent = s.q;
+          $("qe").textContent = s.qe;
+          const im = $("pic"),
+            em = $("emo"),
+            isImg = /[\/.]/.test(s.img);
+          im.style.display = isImg ? "" : "none";
+          em.style.display = isImg ? "none" : "";
+          const el = isImg ? im : em;
+          el.style.animation = "none";
+          el.offsetWidth;
+          el.style.animation = "";
+          if (isImg) im.src = s.img;
+          else em.textContent = s.img;
+          foot("", "Pilih jawaban yang paling tepat.", "Choose the correct answer.");
+          const o = $("opts");
+          o.innerHTML = "";
+          shuffle(s.opts).forEach((x, n) => {
+            const bt = document.createElement("button");
+            bt.className = "opt" + (x.bin ? "" : " txt");
+            bt.style.top = 998 + n * 194 + "px";
+            bt.dataset.ok = x.ok;
+            bt.innerHTML =
+              '<span class="l">' +
+              "ABC"[n] +
+              "</span>" +
+              (x.bin
+                ? '<span class="ic"><img src="assets/elements/kotak-sampah-' + x.bin + '-tutup.png" alt=""></span>'
+                : "") +
+              '<span class="t">' +
+              x.id +
+              "<small>" +
+              x.en +
+              "</small></span>";
+            bt.onclick = () => ans(bt);
+            o.appendChild(bt);
+          });
+          t0 = Date.now();
+          lastSec = null;
+          clearInterval(timer);
+          tick();
+          timer = setInterval(tick, 100);
+        }
+        function tick() {
+          const r = LIMIT - (Date.now() - t0) / 1000,
+            sec = Math.max(0, Math.ceil(r));
+          $("time").textContent = "00:" + String(sec).padStart(2, "0");
+          if (sec !== lastSec) {
+            lastSec = sec;
+            $("tmb").classList.toggle("low", sec <= 5);
+            if (sec <= 5 && sec > 0) SFX.tick();
+          }
+          if (r <= 0) ans(null);
+        }
+        function ans(bt) {
+          if (lock) return;
+          lock = true;
+          clearInterval(timer);
+          const ok = bt && bt.dataset.ok === "true";
+          document.querySelectorAll(".opt").forEach((b) => {
+            if (b.dataset.ok === "true") b.classList.add("ok");
+          });
+          if (ok) {
+            sc++;
+            SFX.good();
+            foot("ok", "Benar! +1", "Correct!");
+          } else if (bt) {
+            sc--;
+            SFX.bad();
+            bt.classList.add("bad");
+            foot("bad", "Salah! -1", "Wrong!");
+          } else {
+            SFX.bad();
+            foot("bad", "Waktu habis!", "Time's up!");
+          }
+          $("score").textContent = sc;
+          setTimeout(() => {
+            i++;
+            if (i < N) show();
+            else {
+              S.set("kuis", sc);
+              goTo(NEXT[area] || "hasil.html");
+            }
+          }, 2000);
+        }
+        show();
+      </script>
+    </div>
+  </body>
+</html>

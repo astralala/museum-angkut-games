@@ -1,0 +1,22 @@
+/* Layar kaca buram saat memuat: semua elemen di .stage disembunyikan dan animasinya ditahan
+   sampai common.js melepas kelas `loading` dari <body>, lalu semuanya muncul bersamaan */
+#veil {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  background: rgba(255, 255, 255, 0.18);
+  transition: opacity 0.6s ease;
+}
+body:not(.loading) #veil {
+  opacity: 0;
+  pointer-events: none;
+}
+.loading .stage *,
+.loading .stage {
+  animation-play-state: paused !important;
+}
+.loading .stage > :not(#veil) {
+  visibility: hidden;
+}

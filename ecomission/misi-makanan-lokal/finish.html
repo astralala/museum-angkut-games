@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Misi Selesai</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script src="sfx.js"></script>
+    <link rel="stylesheet" href="css/finish.css" />
+    <script src="../bgm.js"></script>
+  </head>
+  <body class="loading">
+    <div id="stage">
+      <img
+        id="content"
+        src="assets/finishcontent.png"
+        alt="Pilihan Makananmu, Masa Depan yang Lebih Cerah. Pilih Makanan Lokal, Semakin Pendek Jarak Transportasi, Bumi yang Lebih Sehat."
+      />
+
+      <img
+        class="bubble"
+        src="assets/bubblefinish.png"
+        alt="Yuk mulai dari pilihan makananmu untuk menjaga bumi! Let's start from your food choice to protect our planet."
+      />
+
+      <iframe
+        id="maskot"
+        src="../bubum/tunjuk.html"
+        title="Maskot Bubum"
+        scrolling="no"
+        allowtransparency="true"
+      ></iframe>
+
+      <button class="pillbtn btn" id="home" aria-label="Home"></button>
+      <button class="pillbtn btn" id="another" aria-label="Play Another Mission"></button>
+      <div id="veil"></div>
+    </div>
+
+    <script>
+      // Scaling responsif: jaga rasio 16:9, muat di layar berapa pun resolusinya
+      function fit() {
+        const s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+        document.documentElement.style.setProperty("--scale", s);
+      }
+      window.addEventListener("resize", fit);
+      fit();
+
+      // `load` menunggu semua gambar dan iframe Bubum; baru setelah itu buka kaca buram,
+      // jalankan efek zoom gambar konten, dan putar suara
+      window.addEventListener("load", () => {
+        document.body.classList.remove("loading");
+        document.getElementById("content").classList.add("show");
+        setTimeout(() => SFX.win(), 300);
+      });
+      document.getElementById("home").onclick = () => {
+        goTo("../index.html");
+      };
+      document.getElementById("another").onclick = () => {
+        goTo("../choose_game.html");
+      };
+    </script>
+  </body>
+</html>

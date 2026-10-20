@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pilih Makananmu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script src="sfx.js"></script>
+    <link rel="stylesheet" href="css/gameplay.css" />
+    <script src="../bgm.js"></script>
+  </head>
+  <body class="loading">
+    <div id="stage">
+      <div id="game">
+        <img
+          id="t-pilih"
+          src="assets/lokal_0009_title-pilih-makanan.png"
+          alt="Pilih Makananmu! Seret makanan dari kiri ke piring di kanan!"
+        />
+        <img
+          id="t-susun"
+          src="assets/lokal_0025_title-susun-piring.png"
+          alt="Susun Piringmu! Buat makanan seimbang untuk bumi yang lebih sehat!"
+        />
+        <img id="panel" src="assets/lokal_0027_panel-pilh-makanan.png" alt="" />
+        <img id="piring" src="assets/lokal_0024_piring.png" alt="" />
+        <img id="meter" src="assets/lokal_0026_meterjarak.png" alt="Meter Jarak Transportasi" />
+        <img id="mobil" src="assets/lokal_0023_mobilicon.png" alt="" />
+        <img id="truck" src="assets/lokal_0022_barmobilkecil.png" alt="" />
+        <div id="km">0 km</div>
+
+        <div id="menu"></div>
+        <div id="plate"></div>
+
+        <img id="ref" src="assets/lokal_0000_referensimakanan.png" alt="" />
+      </div>
+      <iframe
+        id="maskot"
+        src="../bubum/home2.html"
+        title="Maskot Bubum"
+        scrolling="no"
+        allowtransparency="true"
+      ></iframe>
+      <button class="btn" id="pilih" disabled>✔ Pilih Makanan Ini</button>
+      <div id="veil"></div>
+    </div>
+
+    <script src="data.js"></script>
+
+    <script src="../sheet-local.js"></script>
+
+    <script>
+      // Scaling responsif: jaga rasio 16:9, muat di layar berapa pun resolusinya
+      function fit() {
+        const s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+        document.documentElement.style.setProperty("--scale", s);
+      }
+      window.addEventListener("resize", fit);
+      fit();
+      if (location.search.includes("ref")) document.body.classList.add("show-ref");
+
+      // `load` menunggu semua gambar; baru setelah itu buka kaca buram
+      window.addEventListener("load", () => document.body.classList.remove("loading"));
+
+      // Posisi tiap gambar makanan di panel kiri (koordinat referensi, dicocokkan otomatis ke gambar referensi)
+      const FOOD_POS = {
+        "beras-garut": [40, 257],
+        "beras-thailand": [240, 259],
+        "timun-lokal": [459, 283],
+        zucchini: [658, 257],
+        "daging-lokal": [39, 541],
+        "sirloin-australia": [243, 527],
+        "apel-batu": [456, 523],
+        "stroberi-korea": [660, 531],
+      };
+      // Posisi area kategori di piring (koordinat referensi)
+      const SLOT_POS = {
+        karbo: { left: 1014, top: 291, width: 175 },
+        sayur: { left: 1189, top: 292, width: 174 },
+        protein: { left: 1007, top: 468, width: 181 },
+        lengkap: { left: 1188, top: 467, width: 170 },
+      };
+      // Gambar daging sapi lokal di piring sudah dipotong (tanpa ruang kosong kiri-atas 8px)
+      const PLATE_FIX = { "daging-lokal": { dx: 8 } };
+
+      const T_START = Date.now();
+      const picks = {};
+      const plate = document.getElementById("plate"),
+        menu = document.getElementById("menu"),
+        btn = document.getElementById("pilih");
+      const TRACK = { left: 198, width: 864 }; // panjang bar di gambar meter
+
+      // Muat dulu gambar makanan-di-piring agar langsung tampil saat makanan diletakkan
+      FOODS.forEach((f) => {
+        const i = new Image();
+        i.src = f.plate;
+        document.body.append(Object.assign(i, { hidden: true }));
+      });
+
+      CATS.forEach((c) => {
+        FOODS.filter((f) => f.cat === c.id).forEach((f) => {
+          const e = document.createElement("div");
+          e.className = "food";
+          e.dataset.id = f.id;
+          e.style.left = FOOD_POS[f.id][0] + "px";
+          e.style.top = FOOD_POS[f.id][1] + "px";
+          e.innerHTML = `<img src="${f.img}" alt="${f.name}">`;
+          e.addEventListener("pointerdown", (ev) => drag(ev, f, e));
+          menu.append(e);
+        });
+
+        const p = SLOT_POS[c.id];
+        const s = document.createElement("div");
+        s.className = "slot";
+        s.dataset.cat = c.id;
+        Object.assign(s.style, { left: p.left + "px", top: p.top + "px", width: p.width + "px" });
+        s.onclick = () => {
+          delete picks[c.id];
+          render();
+        };
+        plate.append(s);
+      });
+
+      function render() {
+        document.querySelectorAll(".slot").forEach((s) => {
+          const c = CATS.find((x) => x.id === s.dataset.cat),
+            f = picks[c.id],
+            p = SLOT_POS[c.id];
+          const fix = f && PLATE_FIX[f.id];
+          s.style.left = p.left + (fix ? fix.dx : 0) + "px";
+          // Area kosong memakai lebar area; gambar makanan memakai ukuran aslinya
+          // (beberapa gambar, mis. apel batu & sirloin, sedikit lebih lebar dari areanya dan jadi mengecil kalau dipaksa)
+          s.style.width = f ? "auto" : p.width + "px";
+          s.innerHTML = `<img src="${f ? f.plate : c.area}" alt="${f ? f.name : c.name}" style="width:${f ? "auto" : "100%"}">`;
+        });
+        document.querySelectorAll(".food").forEach((e) =>
+          e.classList.toggle(
+            "used",
+            Object.values(picks).some((f) => f.id === e.dataset.id),
+          ),
+        );
+        btn.disabled = Object.keys(picks).length < CATS.length;
+      }
+
+      function drag(ev, f, el) {
+        ev.preventDefault();
+        SFX.pick();
+        const im = el.querySelector("img"),
+          r = im.getBoundingClientRect();
+        const g = im.cloneNode(true);
+        g.className = "ghost";
+        g.style.width = r.width * 1.1 + "px";
+        g.style.transform = "translate(-50%,-50%) rotate(-4deg)";
+        document.body.append(g);
+        const mv = (e) => {
+          g.style.left = e.clientX + "px";
+          g.style.top = e.clientY + "px";
+          document.querySelectorAll(".slot").forEach((s) => s.classList.remove("hot"));
+          const t = document.elementFromPoint(e.clientX, e.clientY)?.closest(".slot");
+          if (t && t.dataset.cat === f.cat) t.classList.add("hot");
+        };
+        const up = (e) => {
+          removeEventListener("pointermove", mv);
+          removeEventListener("pointerup", up);
+          g.remove();
+          document.querySelectorAll(".slot").forEach((s) => s.classList.remove("hot"));
+          const t = document.elementFromPoint(e.clientX, e.clientY)?.closest(".slot");
+          if (t) {
+            if (t.dataset.cat === f.cat) {
+              picks[f.cat] = f;
+              render();
+              SFX.drop();
+            } else {
+              SFX.wrong();
+              t.classList.add("bad");
+              setTimeout(() => t.classList.remove("bad"), 300);
+            }
+          }
+        };
+        mv(ev);
+        addEventListener("pointermove", mv);
+        addEventListener("pointerup", up);
+      }
+
+      btn.onclick = () => {
+        SFX.go();
+        btn.disabled = true;
+        document.querySelectorAll(".food").forEach((e) => (e.style.pointerEvents = "none"));
+        document.querySelectorAll(".slot").forEach((s) => (s.onclick = null));
+        const total = Object.values(picks).reduce((a, f) => a + f.km, 0),
+          t0 = performance.now(),
+          DUR = 5000;
+        let lt = 0;
+        (function step(now) {
+          const p = Math.min(1, (now - t0) / DUR);
+          if (now - lt > 120) {
+            SFX.tick();
+            lt = now;
+          }
+          const km = Math.round(total * p),
+            x = barPos(km);
+          document.getElementById("km").textContent = km.toLocaleString("id-ID") + " km";
+          // Jaga mobil (lebar 65px) tetap di dalam bar: titik tengahnya bergerak dari ujung kiri+32.5 sampai ujung kanan-32.5
+          document.getElementById("truck").style.left = TRACK.left + 32.5 + ((TRACK.width - 65) * x) / 100 + "px";
+          if (p < 1) requestAnimationFrame(step);
+          else
+            setTimeout(() => {
+              const lb = JSON.parse(localStorage.getItem("mml_leaderboard") || "[]"),
+                id = Date.now();
+              lb.push({ id, nama: localStorage.getItem("mml_nama") || "Pemain", km: total });
+              localStorage.setItem("mml_leaderboard", JSON.stringify(lb));
+              localStorage.setItem("mml_last_id", id);
+              catatMain({
+                misi: "Misi Makanan Sehat",
+                nama: localStorage.getItem("mml_nama"),
+                skor: total + " km",
+                waktu: Math.round((Date.now() - T_START) / 1000),
+                hasil: total <= THRESHOLD ? "Good (jejak karbon rendah)" : "Bad (jejak karbon tinggi)",
+              });
+              sessionStorage.setItem("mml_hasil", JSON.stringify({ picks: Object.values(picks), total }));
+              location.href = "ending.html";
+            }, 1000);
+        })(t0);
+      };
+      render();
+    </script>
+  </body>
+</html>

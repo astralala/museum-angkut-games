@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <title>Game Area Perumahan</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div id="frame" class="gm perumahan blurin">
+      <div class="hud" id="tm"><img src="assets/elements/timerbar.png" alt="" /><span id="time">00:30</span></div>
+      <div class="hud" id="sk">
+        <img src="assets/elements/skorbar.png" alt="" /><span>Skor: <b id="score">0</b></span>
+      </div>
+      <div class="bin" data-t="o" data-n="organik" style="left: 177px">
+        <img src="assets/elements/kotak-sampah-organik-tutup.png" alt="Organik" />
+      </div>
+      <div class="bin" data-t="a" data-n="anorganik" style="left: 423px">
+        <img src="assets/elements/kotak-sampah-anorganik-tutup.png" alt="Anorganik" />
+      </div>
+      <div class="bin" data-t="b" data-n="b3" style="left: 663px">
+        <img src="assets/elements/kotak-sampah-b3-tutup.png" alt="B3" />
+      </div>
+      <div id="items"></div>
+      <img class="caption" src="assets/elements/captionpilihsampah.png" alt="Pilih sampah dengan tepat!" />
+      <div class="pop" id="pop">
+        <div class="box">
+          <div class="ic" id="pIc"></div>
+          <h2 id="pT"></h2>
+          <p class="en" id="pE"></p>
+          <div class="sc">Skor: <b id="pS">0</b></div>
+          <p class="nx">Lanjut ke sesi kuis<small>Let's continue to the quiz</small></p>
+          <button class="go" aria-label="Continue" onclick="toQuiz()"></button>
+        </div>
+      </div>
+      <script>
+        window.CFG = {};
+      </script>
+      <script src="js/common.js"></script>
+      <script>
+        need("nama");
+        need("area", "area.html");
+        const D = "assets/sampah_rumah/",
+          ITEMS = [
+            ["organik-rumah-kulit-pisang", "o"],
+            ["organik-rumah-sayuran", "o"],
+            ["organik-rumah-daun-kering", "o"],
+            ["organik-rumah-kulit-apel", "o"],
+            ["anorganik-rumah-botol-plastik", "a"],
+            ["anorganik-rumah-kaleng-minuman", "a"],
+            ["anorganik-rumah-kantong-plastik", "a"],
+            ["anorganik-rumah-kardus", "a"],
+            ["anorganik-rumah-kertas", "a"],
+            ["anorganik-rumah-kotak-susu", "a"],
+            ["b3-rumah-baterai", "b"],
+            ["b3-rumah-bohlam", "b"],
+          ];
+        /* titik tengah slot sampah (grid 4x3 sesuai mockup) */
+        const SLOTS = [];
+        [1000, 1250, 1500].forEach((y) => [155, 410, 655, 905].forEach((x) => SLOTS.push([x, y])));
+        const LIMIT = 30,
+          $ = (id) => document.getElementById(id),
+          bins = [...document.querySelectorAll(".bin")];
+        let score = 0,
+          ok = 0,
+          bad = 0,
+          left = ITEMS.length,
+          t0,
+          timer,
+          over = false,
+          lastSec;
+        /* preload gambar tong terbuka */
+        bins.forEach((b) => {
+          new Image().src = src(b, "open");
+        });
+        function src(b, s) {
+          return "assets/elements/kotak-sampah-" + b.dataset.n + "-" + s + ".png";
+        }
+        function lid(b, open) {
+          const s = open ? "open" : "tutup";
+          if (b.dataset.s !== s) {
+            b.dataset.s = s;
+            b.firstElementChild.src = src(b, s);
+          }
+        }
+        function fmt(s) {
+          s = Math.max(0, Math.ceil(s));
+          return "00:" + String(s).padStart(2, "0");
+        }
+        function start() {
+          [...ITEMS]
+            .sort(() => Math.random() - 0.5)
+            .forEach(([f, t], i) => {
+              const el = document.createElement("div");
+              el.className = "item";
+              el.dataset.t = t;
+              el.style.left = SLOTS[i][0] + "px";
+              el.style.top = SLOTS[i][1] + "px";
+              el.innerHTML = '<img draggable="false" src="' + D + f + '.png" alt="">';
+              el.addEventListener("pointerdown", down);
+              $("items").appendChild(el);
+            });
+          t0 = Date.now();
+          timer = setInterval(() => {
+            const r = LIMIT - (Date.now() - t0) / 1000;
+            $("time").textContent = fmt(r);
+            const sec = Math.ceil(r);
+            if (sec !== lastSec) {
+              lastSec = sec;
+              $("tm").classList.toggle("low", sec <= 5);
+              if (sec <= 5 && sec > 0) SFX.tick();
+            }
+            if (r <= 0) finish("Waktu Habis!");
+          }, 100);
+        }
+        function binAt(e) {
+          return (
+            bins.find((b) => {
+              const r = b.getBoundingClientRect();
+              return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+            }) || null
+          );
+        }
+        function down(ev) {
+          if (over || (ev.pointerType === "mouse" && ev.button > 0)) return;
+          ev.preventDefault();
+          SFX.pick();
+          const el = ev.currentTarget,
+            fr = $("frame"),
+            id = ev.pointerId;
+          const gh = el.cloneNode(true);
+          gh.classList.add("drag");
+          fr.appendChild(gh);
+          el.classList.add("picked");
+          const place = (e) => {
+            const r = fr.getBoundingClientRect(),
+              k = window.K || 1;
+            gh.style.left = (e.clientX - r.left) / k - 115 + "px";
+            gh.style.top = (e.clientY - r.top) / k - 115 + "px";
+            const h = binAt(e);
+            bins.forEach((b) => lid(b, b === h));
+          };
+          place(ev);
+          const mv = (e) => {
+            if (e.pointerId === id) place(e);
+          };
+          const end = (e) => {
+            if (e.pointerId !== id) return;
+            removeEventListener("pointermove", mv);
+            removeEventListener("pointerup", end);
+            removeEventListener("pointercancel", end);
+            gh.remove();
+            el.classList.remove("picked");
+            if (e.type === "pointerup") drop(el, e);
+            else bins.forEach((b) => lid(b, false));
+          };
+          addEventListener("pointermove", mv);
+          addEventListener("pointerup", end);
+          addEventListener("pointercancel", end);
+        }
+        function drop(el, e) {
+          const hit = binAt(e);
+          if (!hit || over) {
+            bins.forEach((b) => lid(b, false));
+            return;
+          }
+          if (hit.dataset.t === el.dataset.t) {
+            score++;
+            ok++;
+            el.remove();
+            left--;
+            flash(hit, "ok");
+            SFX.good();
+          } else {
+            score--;
+            bad++;
+            flash(hit, "bad");
+            SFX.bad();
+          }
+          $("score").textContent = score;
+          setTimeout(() => lid(hit, false), 400);
+          if (left === 0) finish("Semua Terpilah!");
+        }
+        function flash(b, c) {
+          b.classList.add(c);
+          setTimeout(() => b.classList.remove(c), 350);
+        }
+        function finish(title) {
+          if (over) return;
+          over = true;
+          clearInterval(timer);
+          const used = Math.min(LIMIT, (Date.now() - t0) / 1000);
+          S.set("skor", score);
+          S.set("waktu", used.toFixed(1));
+          S.set("benar", ok);
+          S.set("salah", bad);
+          S.set("judul", title);
+          left === 0 ? SFX.win() : SFX.lose();
+          showPop(left === 0);
+        }
+        /* pop up: waktu habis / semua terpilah, lalu ke kuis (tombol atau otomatis 6 detik) */
+        let toQ = false;
+        function toQuiz() {
+          if (toQ) return;
+          toQ = true;
+          SFX.click();
+          goTo("kuis.html");
+        }
+        function showPop(all) {
+          const p = $("pop");
+          p.classList.toggle("late", !all);
+          $("pIc").textContent = all ? "🎉" : "⏰";
+          $("pT").textContent = all ? "Hebat! Semua terpilah!" : "Waktu habis!";
+          $("pE").textContent = all ? "Great job! All the trash is sorted!" : "Time's up!";
+          $("pS").textContent = score;
+          setTimeout(() => p.classList.add("on"), 500);
+          setTimeout(toQuiz, 6500);
+        }
+        start();
+      </script>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Ending</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/ending.css" />
+    <link rel="stylesheet" href="css/loading.css" />
+    <script src="../bgm.js"></script>
+  </head>
+  <body class="loading">
+    <div class="stage" style="background-image: url(assets/scene_after.png)">
+      <video
+        id="bg"
+        src="assets/pemandangan_after.mp4"
+        poster="assets/scene_after.png"
+        autoplay
+        muted
+        loop
+        playsinline
+      ></video>
+      <img
+        id="title"
+        src="assets/titlemisiberhasil.png"
+        alt="Selamat! Misi Energi Bersih Berhasil! Congratulations! Clean Energy Mission Completed!"
+      />
+      <img
+        class="corner"
+        id="signL"
+        src="assets/bersamapojok.png"
+        alt="Bersama Kita Jaga Bumi - Together We Care for Earth"
+      />
+      <img
+        class="corner"
+        id="signR"
+        src="assets/energibersihpojokkanan.png"
+        alt="Energi Bersih untuk Generasi Mendatang - Clean Energy for Future Generations"
+      />
+      <iframe
+        id="maskot"
+        src="../bubum/menyapa.html"
+        title="Maskot Bubum"
+        scrolling="no"
+        allowtransparency="true"
+      ></iframe>
+      <img
+        id="panel"
+        src="assets/panel%20tengah.png"
+        alt="Dengan memanfaatkan energi terbarukan, kita dapat mengurangi polusi udara, menjaga lingkungan tetap hijau, dan menciptakan masa depan yang lebih sehat. Udara lebih bersih, lingkungan lebih sehat, masa depan lebih baik."
+      />
+      <div id="score" aria-label="Skor Kamu"><b id="sc">0</b></div>
+      <div id="t"><span class="ic">👤</span><span id="nm"></span><span class="sep"></span>⏱ <b id="tm"></b></div>
+      <button class="lb" id="lbBtn" onclick="clickGo('leaderboard.html')"><span>🏆</span>Lihat Leaderboard</button>
+      <button class="lb" id="home" aria-label="Home" onclick="clickGo('../index.html')"></button>
+      <button
+        class="lb"
+        id="another"
+        aria-label="Play Another Mission"
+        onclick="clickGo('../choose_game.html')"
+      ></button>
+      <div id="veil"></div>
+    </div>
+    <script src="common.js"></script>
+    <script src="../sfx.js"></script>
+    <script>
+      document.getElementById("nm").textContent = sessionStorage.getItem(KEY_NAME) || "Pemain";
+      document.getElementById("tm").textContent = fmt(+sessionStorage.getItem("misiEnergi_time") || 0);
+      document.getElementById("sc").textContent = +sessionStorage.getItem("misiEnergi_score") || 0;
+    </script>
+  </body>
+</html>

@@ -22,11 +22,11 @@ const SFX={pick(){tone(520,.08,'sine',0,.12)},tick(){tone(1000,.05,'square',0,.0
    Di halaman permainan pilah sampah (game-*.html) dan kuis (kuis.html) musik DIAM: goTo() memudarkannya sebelum masuk,
    dan setelah kuis musik muncul lagi pelan-pelan (di hasil.html) dari posisi terakhir sebelum game.
    BGM_ON = false untuk mematikan musik latar. */
-const BGM_ON=true;
+const BGM_ON = true;
 const BGM_SILENT=url=>/(^|\/)(game-[^\/]*|kuis\.html)$/.test(String(url).split(/[?#]/)[0]);   // halaman tanpa musik: game pilah sampah & kuis
 const BGM_FILE='BouncyGameGroove.mp3';   // ganti nama file di sini untuk mengganti lagu (file di assets/videos/)
 /* kunci posisi memakai nama file, supaya lagu baru mulai dari awal (bukan dari posisi lagu lama) */
-const BGM=BGM_ON&&(()=>{const a=new Audio(),VOL=.63,K='pilah_bgm_t_'+BGM_FILE;a.loop=true;a.preload='auto';a.volume=0;
+const BGM=BGM_ON&&(()=>{const a=new Audio(),VOL=.27,K='pilah_bgm_t_'+BGM_FILE;a.loop=true;a.preload='auto';a.volume=0;
  /* lanjutkan dari posisi tersimpan. currentTime bisa diabaikan browser kalau info lagu belum termuat,
     jadi dipasang saat loadedmetadata dan tepat sebelum play() */
  const T0=(()=>{try{return parseFloat(sessionStorage.getItem(K))||0}catch(e){return 0}})();let seeked=false,ready=false;
@@ -35,11 +35,11 @@ const BGM=BGM_ON&&(()=>{const a=new Audio(),VOL=.63,K='pilah_bgm_t_'+BGM_FILE;a.
  /* musik langsung di volume penuh (tanpa naik pelan-pelan) */
  let fadeT;function fadeIn(){clearInterval(fadeT);a.volume=VOL}
  /* naik pelan-pelan dari hening ke VOL dalam ms milidetik (dipakai sesudah game/kuis) */
- function fadeUp(ms){clearInterval(fadeT);a.volume=0;const t0=performance.now();fadeT=setInterval(()=>{const p=Math.min(1,(performance.now()-t0)/ms);a.volume=VOL*p;if(p>=1)clearInterval(fadeT)},30)}
- /* pudar sampai hilang dalam ms milidetik, lalu berhenti */
- a.fadeOut=ms=>{clearInterval(fadeT);const v0=a.volume,t0=performance.now();fadeT=setInterval(()=>{const p=Math.min(1,(performance.now()-t0)/ms);a.volume=v0*(1-p);if(p>=1){clearInterval(fadeT);a.pause()}},30)};
- /* LIVE = musik sedang jalan saat halaman sebelumnya ditutup. Kalau ya, halaman ini langsung lanjut di volume penuh
-    (tidak "hilang lalu naik lagi"); fade-in hanya saat musik baru mulai atau kembali dari game/kuis. */
+ function fadeUp(ms){clearInterval(fadeT);a.volume=0;const t0=performance.now();fadeT=setInterval(()=>{const p=Math.min(1,(performance.now()-t0)/ms);a.volume=VOL*p*p;if(p>=1)clearInterval(fadeT)},30)}   // p*p: kurva kuadrat, terdengar lebih halus di telinga dibanding naik lurus
+ /* pudar sampai hilang dalam ms milidetik, lalu berhenti (stay = tetap jalan tanpa suara, dipakai saat pindah halaman biasa) */
+ a.fadeOut=(ms,stay)=>new Promise(done=>{clearInterval(fadeT);const v0=a.volume,t0=performance.now();fadeT=setInterval(()=>{const p=Math.min(1,(performance.now()-t0)/ms);a.volume=v0*(1-p)*(1-p);if(p>=1){clearInterval(fadeT);a.volume=0;if(!stay)a.pause();done()}},30)});
+ /* LIVE = musik sedang jalan saat halaman sebelumnya ditutup. Kalau ya, halaman ini lanjut dari posisi itu
+    dan volumenya naik halus (pasangan dari pudar saat keluar halaman sebelumnya). */
  const LIVE='pilah_bgm_live',wasLive=(()=>{try{return sessionStorage.getItem(LIVE)==='1'}catch(e){return false}})();
  /* AFTER = baru keluar dari game/kuis: musik di halaman berikutnya naik pelan-pelan (fadeUp) */
  const AFTER='pilah_bgm_after',wasSilent=(()=>{try{return sessionStorage.getItem(AFTER)==='1'}catch(e){return false}})();
@@ -55,22 +55,25 @@ const BGM=BGM_ON&&(()=>{const a=new Audio(),VOL=.63,K='pilah_bgm_t_'+BGM_FILE;a.
  const SRC=new URL('assets/videos/'+BGM_FILE,location.href).href;
  songBlob(SRC).then(b=>load(URL.createObjectURL(b))).catch(()=>load(SRC));
  const save=()=>{if(!ready||a.readyState<1)return;   // lagu belum termuat: jangan timpa posisi tersimpan dengan 0
-  try{sessionStorage.setItem(K,a.currentTime);sessionStorage.setItem(LIVE,!a.paused&&a.volume>0?'1':'0')}catch(e){}};
- /* Ctrl+Shift+. (titik) (untuk petugas): matikan / nyalakan musik latar. Pilihan disimpan di localStorage, berlaku di semua halaman. */
- const OFF='pilah_bgm_off',isOff=()=>{try{return localStorage.getItem(OFF)==='1'}catch(e){return false}};
+  try{sessionStorage.setItem(K,a.currentTime);sessionStorage.setItem(LIVE,!a.paused&&(a.volume>0||a.leaving)?'1':'0')}catch(e){}};
+ /* Ctrl+Shift+. (titik) (untuk petugas): matikan / nyalakan musik latar. Pilihan disimpan di localStorage, berlaku di semua halaman. Default: mati (belum ada pilihan tersimpan = mati). */
+ const OFF='pilah_bgm_off',isOff=()=>{try{return localStorage.getItem(OFF)!=='0'}catch(e){return true}};
  addEventListener('keydown',e=>{if(!(e.ctrlKey&&e.shiftKey&&!e.altKey&&e.code==='Period'))return;e.preventDefault();e.stopPropagation();
   const off=!isOff();try{localStorage.setItem(OFF,off?'1':'0')}catch(e){}
   if(off)a.fadeOut(400);else{a.volume=0;a.play().then(fadeIn).catch(()=>{})}
   const t=document.createElement('div');t.textContent=off?'🔇 Musik: mati':'🎵 Musik: nyala';
   t.style.cssText='position:fixed;left:50%;top:24px;transform:translateX(-50%);z-index:9999;padding:10px 22px;border-radius:999px;background:rgba(0,0,0,.72);color:#fff;font:600 18px Arial,sans-serif;pointer-events:none;transition:opacity .4s';
   document.body.append(t);setTimeout(()=>t.style.opacity=0,1200);setTimeout(()=>t.remove(),1700)},true);
- function start(){if(!ready||!a.paused||isOff())return;seek();if(wasLive)a.volume=VOL;
-  a.play().then(()=>{if(wasSilent){fadeUp(2000);try{sessionStorage.setItem(AFTER,'0')}catch(e){}}else if(!wasLive)fadeIn()}).catch(()=>{a.volume=0})}
+ function start(){if(!ready||!a.paused||isOff())return;seek();
+  a.play().then(()=>{if(wasSilent){fadeUp(2000);try{sessionStorage.setItem(AFTER,'0')}catch(e){}}else if(wasLive)fadeUp(1600);else fadeIn()}).catch(()=>{a.volume=0})}
  const kick=()=>{start();if(ready&&!a.paused){removeEventListener('pointerdown',kick,true);removeEventListener('keydown',kick,true)}};
  addEventListener('pointerdown',kick,true);addEventListener('keydown',kick,true);
  addEventListener('pagehide',save);setInterval(save,1000);
  setInterval(()=>{a.muted=!!window.MUTED},250);
  start();return a})();
+/* preloader & service worker sudah tidak dipakai: lepas sisa pendaftarannya di browser yang pernah membukanya */
+if('serviceWorker' in navigator)navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister())).catch(()=>{});
+if('caches' in window)caches.keys().then(ks=>ks.forEach(k=>{if(/^wastesorting/.test(k))caches.delete(k)})).catch(()=>{});
 function need(k,to){if(S.get(k)===null){location.replace(to||'home.html')}}
 
 window.K=1;
@@ -80,13 +83,16 @@ function fit(){const f=document.getElementById('frame');if(!f)return;const k=Mat
 addEventListener('resize',fit);addEventListener('orientationchange',fit);fit();
 
 /* pindah halaman dengan efek blur keluar */
-/* Menuju halaman game/kuis saat musik nyala: musik memudar pelan 1.5 dtk, perpindahan ditunda sampai pudarnya selesai */
-function goTo(url){let wait=450;
- if(BGM&&BGM_SILENT(url)&&!BGM.paused){BGM.fadeOut(1500);wait=1500}
- const f=document.getElementById('frame');if(!f){setTimeout(()=>{location.href=url},wait-450);return}
- setTimeout(()=>{f.classList.remove('blurin');f.classList.add('pg-out')},wait-450);setTimeout(()=>{location.href=url},wait)}
+/* Sebelum pindah halaman musik memudar halus sampai volume 0, baru setelah itu pindah
+   (di halaman tujuan volume naik lagi dari 0). Menuju game/kuis: pudar lebih pelan 1.5 dtk dan musik berhenti. */
+function goTo(url){if(goTo.busy)return;goTo.busy=true;
+ const fade=BGM&&!BGM.paused?(BGM_SILENT(url)?BGM.fadeOut(1500):(BGM.leaving=true,BGM.fadeOut(900,true))):Promise.resolve();
+ const wait=BGM&&!BGM.paused?(BGM_SILENT(url)?1500:900):450;
+ const f=document.getElementById('frame');
+ if(f)setTimeout(()=>{f.classList.remove('blurin');f.classList.add('pg-out')},wait-450);
+ Promise.all([fade,new Promise(r=>setTimeout(r,f?wait:0))]).then(()=>{location.href=url})}
 /* kalau kembali lewat tombol back (bfcache), hilangkan sisa blur */
-addEventListener('pageshow',e=>{if(e.persisted){const f=document.getElementById('frame');if(f)f.classList.remove('pg-out')}});
+addEventListener('pageshow',e=>{if(e.persisted){goTo.busy=false;const f=document.getElementById('frame');if(f)f.classList.remove('pg-out')}});
 
 function pageId(){return (location.pathname.split('/').pop()||'index').replace('.html','')}
 /* Pasang gambar assets/bg/<nama-halaman>.png di atas latar bawaan (kalau file ada). */
@@ -98,8 +104,8 @@ function layerBg(el,id){id=id||pageId();const cur=getComputedStyle(el).backgroun
    - keyboard: Ctrl+Y (hapus semua localStorage & sessionStorage)
    - layar sentuh: ketuk pojok kiri atas 5x dalam 3 detik */
 function resetBoard(){if(!confirm('Hapus semua data (leaderboard & storage)?'))return;
- /* antrean Google Sheets (pilah_sheetq) tetap disimpan supaya data yang belum terkirim tidak hilang */
- try{const q=localStorage.getItem('pilah_sheetq');localStorage.clear();if(q!==null)localStorage.setItem('pilah_sheetq',q)}catch(e){}try{sessionStorage.clear()}catch(e){}mem={};location.reload()}
+ /* antrean Google Sheets (pilah_sheetq) & data lokal (pilah_localdb) tetap disimpan supaya data pemain tidak hilang */
+ try{const keep=['pilah_sheetq','pilah_localdb'].map(k=>[k,localStorage.getItem(k)]);localStorage.clear();keep.forEach(([k,v])=>{if(v!==null)localStorage.setItem(k,v)})}catch(e){}try{sessionStorage.clear()}catch(e){}mem={};location.reload()}
 addEventListener('keydown',e=>{if(e.ctrlKey&&!e.shiftKey&&!e.altKey&&e.code==='KeyY'){e.preventDefault();e.stopPropagation();resetBoard()}},true);
 (function(){let n=0,t0=0;addEventListener('pointerdown',e=>{if(e.clientX>120||e.clientY>120)return;
  const now=Date.now();if(now-t0>3000){n=0;t0=now}if(++n>=5){n=0;resetBoard()}},true)})();

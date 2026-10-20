@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bubum Menunjuk</title>
+    <link rel="stylesheet" href="css/tunjuk.css" />
+  </head>
+  <body>
+    <div class="stage" id="stage">
+      <img class="leg-l" src="assets/tunjuk_0010_kaki-kiri.png" alt="" />
+      <img class="leg-r" src="assets/tunjuk_0011_kaki-kanan.png" alt="" />
+
+      <div class="upper">
+        <img class="hand-point" src="assets/tunjuk_0007_tangan-kanan.png" alt="" />
+        <img class="body" src="assets/tunjuk_0001_badan.png" alt="Bubum" />
+        <img class="leaf" src="assets/tunjuk_0002_daun.png" alt="" />
+
+        <div class="face" id="face">
+          <img class="cheek" src="assets/tunjuk_0006_pipi.png" alt="" />
+          <img class="brow" src="assets/tunjuk_0003_alis.png" alt="" />
+          <img class="eyes" src="assets/tunjuk_0004_mata.png" alt="" />
+          <img class="mouth" src="assets/tunjuk_0005_mulut.png" alt="" />
+        </div>
+
+        <img class="hand-thumb" src="assets/tunjuk_0008_tangan-kiri.png" alt="" />
+      </div>
+
+      <img class="alert" src="assets/tunjuk_0009_tanda-seru.png" alt="" />
+    </div>
+
+    <script>
+      const stage = document.getElementById("stage");
+      if (location.search.includes("ref")) stage.classList.add("show-ref");
+
+      // Skala stage agar pas layar
+      function fit() {
+        const s = Math.min(innerWidth / 751, innerHeight / 904) * 0.94;
+        const x = (innerWidth - 751 * s) / 2,
+          y = (innerHeight - 904 * s) / 2;
+        stage.style.transform = `translate(${x}px, ${y}px) scale(${s})`;
+      }
+      addEventListener("resize", fit);
+      fit();
+
+      // Kedipan natural: jeda acak 2–5 dtk, kadang kedip dua kali
+      const face = document.getElementById("face");
+      function blinkOnce(done) {
+        face.classList.add("blink");
+        setTimeout(() => {
+          face.classList.remove("blink");
+          done && done();
+        }, 120);
+      }
+      function scheduleBlink() {
+        setTimeout(
+          () => {
+            blinkOnce(() => {
+              if (Math.random() < 0.25) setTimeout(() => blinkOnce(scheduleBlink), 160);
+              else scheduleBlink();
+            });
+          },
+          2000 + Math.random() * 3000,
+        );
+      }
+      scheduleBlink();
+    </script>
+  </body>
+</html>

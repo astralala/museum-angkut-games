@@ -1,0 +1,38 @@
+/* ===== ATUR POSISI & UKURAN ICON SAMPAH (satuan px NYATA pada kanvas 1080x1920 = 9:16) =====
+   --grid-y   : geser ke bawah (+) / ke atas (-)      contoh: 75px atau -50px
+   --grid-x   : geser ke kanan (+) / ke kiri (-)
+   --item-scale: perbesar/perkecil icon (1 = normal)   contoh: 0.9 atau 1.15
+   --grid-gap : jarak antar icon
+   Bisa diubah di sini (semua area) atau per area dengan menambah
+   <style>:root{--grid-y:100px}</style> di game-perumahan.html dst. */
+:root{--grid-y:0px;--grid-x:0px;--item-scale:1;--grid-gap:25px}
+
+*{box-sizing:border-box;-webkit-user-select:none;user-select:none}
+html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;overscroll-behavior:none;font-family:system-ui,Arial,sans-serif;background:#1b1f27;overflow:hidden}
+#frame{font-size:40px;position:absolute;left:50%;top:50%;width:1080px;height:1920px;transform-origin:0 0;transform:translate(-50%,-50%);overflow:hidden}
+#game{width:100%;height:100%;display:flex;flex-direction:column;padding:0 30px}
+.bar{display:flex;gap:25px;margin:30px 0}
+.pill{flex:1;background:#fff;border:7.5px solid #9cc3e6;border-radius:45px;padding:20px;text-align:center;font-weight:800;font-size:55px;color:#12307a}
+.pill.sk{background:#12307a;color:#fff;border-color:#0b2260}
+.pill.sk b{color:#ffd23f}
+.bins{display:flex;gap:25px;margin:25px 0 45px}
+.bin{flex:1;border-radius:35px;padding:60px 10px;text-align:center;font-weight:900;color:#fff;border:10px solid rgba(0,0,0,.25);transition:transform .15s}
+.bin span{display:block;font-size:100px}
+.o{background:url(../assets/bin/organik.png) center/100% 100% no-repeat,#1fa34a}
+.a{background:url(../assets/bin/anorganik.png) center/100% 100% no-repeat,#f6c10f;color:#222}
+.b{background:url(../assets/bin/b3.png) center/100% 100% no-repeat,#e0262b}
+.bin.ok{outline:15px solid #fff;transform:scale(1.07)}
+.bin.bad{animation:sh .3s}
+@keyframes sh{25%{transform:translateX(-20px)}75%{transform:translateX(20px)}}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--grid-gap);flex:1;align-content:space-evenly;transform:translate(var(--grid-x),var(--grid-y)) scale(var(--item-scale));transform-origin:50% 0}
+.cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center}
+.item{width:100%;height:100%;cursor:grab;touch-action:none}.item img{width:100%;height:100%;display:block;border-radius:35px;pointer-events:none}#mute{position:absolute;right:25px;bottom:195px;width:110px;height:110px;border-radius:50%;margin:0;padding:0;font-size:55px;background:#12307a;z-index:30}
+.item.picked{opacity:.25}
+html,body{touch-action:none}
+.item.drag{position:absolute;z-index:10;margin:0;width:240px;height:240px;filter:drop-shadow(0 20px 20px rgba(0,0,0,.4));pointer-events:none}
+.hint{background:#fff;border:7.5px solid #9cc3e6;border-radius:45px;padding:25px 35px;margin:20px 0 30px;font-weight:700;color:#12307a;text-align:center}
+button{margin-top:35px;background:#1fa34a;color:#fff;border:0;border-radius:35px;font-size:50px;font-weight:800;padding:30px 70px;cursor:pointer}
+
+.item{display:flex;flex-direction:column;align-items:center;justify-content:center}
+.item .em{font-size:115px;line-height:1}.item small{font-size:27.5px;font-weight:800;color:#fff;text-shadow:0 2.5px 7.5px #000;text-align:center;line-height:1.1}
+.item.drag small{display:none}.item.drag .em{font-size:175px}

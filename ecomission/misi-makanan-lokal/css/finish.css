@@ -1,0 +1,167 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+  font-family: "Fredoka", system-ui, sans-serif;
+  color: #10324f;
+}
+button {
+  font: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Tombol mute dari sfx.js */
+body > .key {
+  border: 0;
+  border-radius: 12px;
+  padding: 6px 10px;
+  font-size: 1.4rem;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 3px 0 #9bb;
+  cursor: pointer;
+}
+
+/* Stage 1920x1080, di-scale agar selalu 16:9 dan muat di layar (HD, 2K, 4K) */
+#stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: center center;
+  transform: translate(-50%, -50%) scale(var(--scale, 1));
+  background: url("../assets/home_bg_misi_makanan_lokal.png") center / cover no-repeat;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* ---------- Judul + tiga kartu pesan: satu gambar assets/finishcontent.png (1681x936) ---------- */
+/* Diperkecil 0.8x, sisi kiri berhenti sebelum gelembung Bubum */
+#content {
+  position: absolute;
+  left: 427px;
+  top: 98px;
+  width: 1345px;
+  opacity: 0;
+}
+/* Efek awal: membesar dari kecil, sedikit melewati ukuran asli lalu kembali (dijalankan setelah gambar dimuat) */
+#content.show {
+  animation: zoomIn 0.8s cubic-bezier(0.2, 0.8, 0.3, 1.2) both;
+}
+@keyframes zoomIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ---------- Maskot + gelembung ---------- */
+/* Gelembung dari gambar assets/bubblefinish.png (1774x887) */
+.bubble {
+  position: absolute;
+  left: 40px;
+  top: 415px;
+  width: 430px;
+}
+/* Maskot Bubum animasi menunjuk (rig di ../bubum/tunjuk.html) */
+#maskot {
+  position: absolute;
+  left: 70px;
+  top: 630px;
+  width: 400px;
+  height: 440px;
+  border: 0;
+  background: transparent;
+  pointer-events: none;
+}
+
+/* ---------- Tombol ---------- */
+/* Tombol dari gambar (2172x724, ada ruang transparan di sekeliling; bagian tombol tingginya ±110px di ukuran ini) */
+.pillbtn {
+  position: absolute;
+  top: 833px;
+  width: 444px;
+  height: 148px;
+  border: none;
+  padding: 0;
+  background: center / contain no-repeat;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.pillbtn:active {
+  transform: translateY(6px);
+}
+/* Kedua tombol di tengah, sejajar dengan gambar konten (tengah x ≈ 1100) */
+#home {
+  left: 646px;
+  background-image: url("../assets/btn_home.png");
+}
+#another {
+  left: 1110px;
+  background-image: url("../assets/btn_playanother.png");
+  animation: pulse 1.6s ease-in-out infinite;
+}
+#another:active {
+  animation: none;
+}
+
+/* Saat memuat: layar kaca buram menutupi stage; semua elemen disembunyikan dan animasi ditahan
+     sampai seluruh gambar (termasuk rig Bubum di iframe) selesai dimuat, lalu muncul bersamaan */
+#veil {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  background: rgba(255, 255, 255, 0.18);
+  transition: opacity 0.6s ease;
+}
+body:not(.loading) #veil {
+  opacity: 0;
+  pointer-events: none;
+}
+.loading #stage *,
+.loading #stage {
+  animation-play-state: paused !important;
+}
+#stage > :not(#veil):not(#content) {
+  transition:
+    opacity 0.5s ease,
+    transform 0.1s;
+}
+.loading #stage > :not(#veil) {
+  opacity: 0;
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}

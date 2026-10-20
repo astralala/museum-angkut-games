@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Misi Energi Bersih</title>
+    <link rel="stylesheet" href="css/index.css" />
+    <link rel="stylesheet" href="css/loading.css" />
+    <script src="../bgm.js"></script>
+  </head>
+  <body class="loading">
+    <div id="stage" class="stage">
+      <img id="title" src="assets/title_home.png" alt="Misi Energi Bersih - Bersama Kita Jaga Masa Depan" />
+      <iframe id="bubum" src="../bubum/misibersih.html" title="Bubum" scrolling="no" allowtransparency="true"></iframe>
+      <img id="bubble" src="assets/bubblespeech.png" alt="Yuk, wujudkan kota yang lebih bersih, hijau, dan sehat!" />
+      <button id="play" aria-label="Play"></button>
+      <div id="veil"></div>
+    </div>
+
+    <script src="common.js"></script>
+    <script src="../sfx.js"></script>
+    <script>
+      function fit() {
+        const s = Math.min(innerWidth / 1920, innerHeight / 1080);
+        document.documentElement.style.setProperty("--scale", s);
+      }
+      addEventListener("resize", fit);
+      fit();
+
+      document.getElementById("play").addEventListener("click", () => clickGo("nama.html"));
+    </script>
+  </body>
+</html>

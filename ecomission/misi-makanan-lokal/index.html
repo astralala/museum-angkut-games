@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Misi Makan Sehat untuk Bumi</title>
+    <script src="sfx.js"></script>
+    <link rel="stylesheet" href="css/index.css" />
+    <script src="../bgm.js"></script>
+  </head>
+  <body class="loading">
+    <div id="stage">
+      <img
+        id="title"
+        src="assets/home_title_misi_makanan_lokal.png"
+        alt="Misi Makan Sehat untuk Bumi - Eat Well for a Healthier Earth"
+      />
+      <img id="tabs" src="assets/home_tab_3.png" alt="Makan Enak, Pilih Lokal, Bumi Lebih Sehat" />
+      <img
+        id="keranjang"
+        src="assets/home_keranjang_sayuran.png"
+        alt="Dari Makanan Lokal Untuk Masa Depan yang Lebih Baik!"
+      />
+      <iframe
+        id="maskot"
+        src="../bubum/menyapa.html"
+        title="Maskot Bubum"
+        scrolling="no"
+        allowtransparency="true"
+      ></iframe>
+      <button id="play" aria-label="Play"></button>
+      <div id="veil"></div>
+    </div>
+
+    <script>
+      // Scaling responsif: jaga rasio 16:9, muat di layar berapa pun resolusinya
+      function fit() {
+        const s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+        document.documentElement.style.setProperty("--scale", s);
+      }
+      window.addEventListener("resize", fit);
+      fit();
+
+      // `load` menunggu semua gambar dan iframe; baru setelah itu buka kaca buram
+      window.addEventListener("load", () => document.body.classList.remove("loading"));
+
+      document.getElementById("play").addEventListener("click", () => {
+        goTo("tahukah-kamu.html");
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bubum Home 2</title>
+    <link rel="stylesheet" href="css/home2.css" />
+  </head>
+  <body>
+    <div class="stage" id="stage">
+      <img class="leg-l" src="assets/eco_0008_kaki-kiri.png" alt="" />
+      <!-- home2: kaki kiri di belakang badan -->
+      <img class="leg-r" src="assets/eco_0007_kaki-kanan.png" alt="" />
+
+      <div class="upper">
+        <div class="sway">
+          <img class="fist" src="assets/eco_0010_tangan-kiri.png" alt="" />
+          <img class="hand-r" src="assets/eco_0012_tangan-kanan.png" alt="" />
+          <img class="body" src="assets/eco_0001_badan.png" alt="Bubum" />
+          <img class="leaf" src="assets/eco_0003_daun.png" alt="" />
+
+          <div class="face" id="face">
+            <img class="cheek" src="assets/eco_0005_pipi.png" alt="" />
+            <img class="brow" src="assets/eco_0002_alis.png" alt="" />
+            <img class="eyes" src="assets/eco_0004_mata.png" alt="" />
+            <img class="mouth" src="assets/eco_0006_mulut.png" alt="" />
+          </div>
+        </div>
+      </div>
+
+      <img class="alert" src="assets/eco_0011_tanda-seru.png" alt="" />
+    </div>
+
+    <script>
+      const stage = document.getElementById("stage");
+      if (location.search.includes("ref")) stage.classList.add("show-ref");
+
+      // Skala stage agar pas layar
+      function fit() {
+        const s = Math.min(innerWidth / 890, innerHeight / 1019) * 0.74;
+        const x = (innerWidth - 890 * s) / 2,
+          y = (innerHeight - 1019 * s) / 2;
+        stage.style.transform = `translate(${x}px, ${y}px) scale(${s})`;
+      }
+      addEventListener("resize", fit);
+      fit();
+
+      // Kedipan natural: jeda acak 2–5 dtk, kadang kedip dua kali
+      const face = document.getElementById("face");
+      function blinkOnce(done) {
+        face.classList.add("blink");
+        setTimeout(() => {
+          face.classList.remove("blink");
+          done && done();
+        }, 120);
+      }
+      function scheduleBlink() {
+        setTimeout(
+          () => {
+            blinkOnce(() => {
+              if (Math.random() < 0.25) setTimeout(() => blinkOnce(scheduleBlink), 160);
+              else scheduleBlink();
+            });
+          },
+          2000 + Math.random() * 3000,
+        );
+      }
+      scheduleBlink();
+    </script>
+  </body>
+</html>

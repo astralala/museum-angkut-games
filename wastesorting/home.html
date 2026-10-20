@@ -1,62 +1,62 @@
-<!DOCTYPE html>
-<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"><title>Pilah Sampah</title><link rel="stylesheet" href="css/style.css">
-<link rel="preload" as="image" href="assets/bg/bghome.png">
-<style>
-/* awal: latar tanpa mobil (= frame pertama video), setelah video: latar dengan mobil */
-#frame.hm{display:block;padding:0;background:url(assets/bg/bghomenocar.png) center/1080px 1920px no-repeat}
-.hm img{position:absolute;display:block;pointer-events:none}
-.hm .logo{left:396px;top:88px;width:287px;z-index:7} /* di depan lapisan buram atas (.topblur, z-index 6) */
-.hm .title{left:124px;top:250px;width:833px;z-index:7} /* di depan lapisan buram atas (.topblur, z-index 6) */
-.hm .play{position:absolute;left:308px;top:1497px;width:464px;height:125px;margin:0;padding:0;border-radius:70px;background:url(assets/btn/btnhome.png) center/100% 100% no-repeat;transition:scale .1s}
-.hm .play:active{scale:.95}
-.hm .tabs{left:177px;top:1676px;width:726px}
-
-/* ---- intro: video dulu, lalu bg & elemen muncul satu per satu ---- */
-.hm #intro{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:5;transition:opacity .9s ease}
-.hm.go #intro{opacity:0;pointer-events:none}
-/* efek kaca buram saat masuk halaman, lalu makin jelas */
-.hm #intro{animation:unblur 1.8s .1s cubic-bezier(.4,0,.6,1) both}
-@keyframes unblur{from{filter:blur(36px) brightness(1.25) saturate(1.3);transform:scale(1.08)}to{filter:none;transform:none}}
-.hm .el{opacity:0;pointer-events:none}
-.hm.go .el{pointer-events:auto}
-.hm.go .logo{animation:drop .7s .5s cubic-bezier(.3,1.5,.5,1) both}
-.hm.go .title{animation:zoom .8s .9s cubic-bezier(.3,1.6,.5,1) both}
-.hm.go .tabs{animation:rise .7s 1.5s cubic-bezier(.3,1.4,.5,1) both}
-.hm.go .play{animation:rise .7s 1.9s cubic-bezier(.3,1.6,.5,1) both,pulse 1.4s 2.8s ease-in-out infinite}
-@keyframes drop{from{opacity:0;transform:translateY(-140px)}to{opacity:1;transform:none}}
-@keyframes zoom{from{opacity:0;transform:scale(.3) rotate(-6deg)}to{opacity:1;transform:none}}
-@keyframes rise{from{opacity:0;transform:translateY(160px)}to{opacity:1;transform:none}}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:1;transform:scale(1.07)}}
-#frame.hm.go{background-image:url(assets/bg/bghome.png)}
-/* Buram tambahan khusus bagian atas latar (sama seperti index & introduction): penuh di tepi atas, memudar halus ke bawah.
-   Ditaruh DI ATAS video intro (z-index 6). Mulai memudar masuk saat video masih buram (0.7s) dan penuh di 1.7s, sebelum unblur video
-   selesai (1.9s), jadi bagian atas tidak sempat tampil tajam lalu "terpotong"; ikut ganti latar saat .go */
-.hm .topblur{position:absolute;left:0;top:0;width:1080px;height:560px;pointer-events:none;overflow:hidden;z-index:6;
- animation:topblurIn 1s .7s ease-in-out both;
- -webkit-mask-image:linear-gradient(#000 45%,transparent);mask-image:linear-gradient(#000 45%,transparent)}
-.hm .topblur::before{content:"";position:absolute;left:-40px;top:-40px;width:1160px;height:2000px;
- background:url(assets/bg/bghomenocar.png) 40px 40px/1080px 1920px no-repeat;filter:blur(14px)}
-.hm.go .topblur::before{background-image:url(assets/bg/bghome.png)}
-@keyframes topblurIn{from{opacity:0}to{opacity:1}}
-</style></head>
-<body><div id="frame" class="hm">
-<div class="topblur"></div>
-<img class="el logo" src="assets/elements/logo_toyota_berbagi.png" alt="Toyota Berbagi">
-<img class="el title" src="assets/elements/titlehome.png" alt="Waste Sorting Hub">
-<button class="el play" aria-label="Touch to Play" onclick="SFX.click();S.reset();goTo('introduction.html')"></button>
-<img class="el tabs" src="assets/elements/3columnhometab.png" alt="">
-<video id="intro" src="assets/videos/introhome.mp4" poster="assets/bg/bghomenocar.png" muted autoplay playsinline preload="auto"></video>
-<script>window.CFG={}</script><script src="js/common.js"></script><script>
-const fr=document.getElementById('frame'),vid=document.getElementById('intro');
-let done=false;
-function reveal(){if(done)return;done=true;fr.classList.add('go');setTimeout(()=>vid.remove(),1000)}
-vid.addEventListener('ended',reveal);
-vid.addEventListener('error',reveal);
-/* sentuh layar saat video = lewati */
-vid.addEventListener('pointerdown',reveal);
-/* cadangan: kalau video tidak bisa diputar otomatis / macet */
-vid.play().catch(e=>{if(e.name==='NotAllowedError')reveal()});
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!done)vid.play().catch(()=>{})});
-setTimeout(reveal,9000);
-</script>
-</div></body></html>
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <title>Pilah Sampah</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="preload" as="image" href="assets/bg/bghome.png" />
+  </head>
+  <body>
+    <div id="frame" class="hm">
+      <div class="topblur"></div>
+      <img class="el logo" src="assets/elements/logo_toyota_berbagi.png" alt="Toyota Berbagi" />
+      <img class="el title" src="assets/elements/titlehome.png" alt="Waste Sorting Hub" />
+      <button
+        class="el play"
+        aria-label="Touch to Play"
+        onclick="SFX.click();S.reset();goTo('introduction.html')"
+      ></button>
+      <img class="el tabs" src="assets/elements/3columnhometab.png" alt="" />
+      <video
+        id="intro"
+        src="assets/videos/introhome.mp4"
+        poster="assets/bg/bghomenocar.png"
+        muted
+        autoplay
+        playsinline
+        preload="auto"
+      ></video>
+      <script>
+        window.CFG = {};
+      </script>
+      <script src="js/common.js"></script>
+      <script>
+        const fr = document.getElementById("frame"),
+          vid = document.getElementById("intro");
+        let done = false;
+        function reveal() {
+          if (done) return;
+          done = true;
+          fr.classList.add("go");
+          setTimeout(() => vid.remove(), 1000);
+        }
+        vid.addEventListener("ended", reveal);
+        vid.addEventListener("error", reveal);
+        /* sentuh layar saat video = lewati */
+        vid.addEventListener("pointerdown", reveal);
+        /* cadangan: kalau video tidak bisa diputar otomatis / macet */
+        vid.play().catch((e) => {
+          if (e.name === "NotAllowedError") reveal();
+        });
+        document.addEventListener("visibilitychange", () => {
+          if (!document.hidden && !done) vid.play().catch(() => {});
+        });
+        setTimeout(reveal, 9000);
+      </script>
+    </div>
+  </body>
+</html>

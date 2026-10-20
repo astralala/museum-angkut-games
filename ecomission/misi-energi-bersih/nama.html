@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Isi Nama</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/nama.css" />
+    <link rel="stylesheet" href="css/loading.css" />
+    <script src="../bgm.js"></script>
+  </head>
+  <body class="loading">
+    <div id="stage" class="stage">
+      <div class="panel">
+        <h1>Siapa namamu, <span>Pahlawan Bumi?</span></h1>
+        <div id="nm"></div>
+        <div id="kb"></div>
+        <button id="go" disabled>Continue ➜</button>
+      </div>
+      <div id="veil"></div>
+    </div>
+
+    <script src="common.js"></script>
+    <script src="../sfx.js"></script>
+    <script>
+      // Scaling responsif: jaga rasio 16:9, muat di layar berapa pun resolusinya
+      function fit() {
+        const s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+        document.documentElement.style.setProperty("--scale", s);
+      }
+      window.addEventListener("resize", fit);
+      fit();
+
+      let name = "";
+      const nm = document.getElementById("nm"),
+        go = document.getElementById("go"),
+        MAX = 12;
+      const rows = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
+      function upd() {
+        nm.textContent = name || "Ketik namamu…";
+        nm.classList.toggle("empty", !name);
+        go.disabled = !name.trim();
+      }
+      function key(t, cls, fn) {
+        const b = document.createElement("button");
+        b.className = "k " + (cls || "");
+        b.textContent = t;
+        b.onclick = () => {
+          clickSfx();
+          fn();
+        };
+        return b;
+      }
+      const kb = document.getElementById("kb");
+      rows.forEach((r, i) => {
+        const d = document.createElement("div");
+        d.className = "row";
+        [...r].forEach((c) => d.append(key(c, "", () => add(c))));
+        if (i == 2) d.append(key("⌫", "w", del));
+        kb.append(d);
+      });
+      const last = document.createElement("div");
+      last.className = "row";
+      last.append(
+        key("Spasi", "sp", () => add(" ")),
+        key("Hapus semua", "w", () => {
+          name = "";
+          upd();
+        }),
+      );
+      kb.append(last);
+      function add(c) {
+        if (name.length < MAX) {
+          name += c;
+          upd();
+        }
+      }
+      function del() {
+        name = name.slice(0, -1);
+        upd();
+      }
+      addEventListener("keydown", (e) => {
+        if (e.key == "Backspace") del();
+        else if (/^[a-z ]$/i.test(e.key)) add(e.key.toUpperCase());
+        else if (e.key == "Enter" && !go.disabled) go.click();
+      });
+      go.onclick = () => {
+        sessionStorage.setItem(KEY_NAME, name.trim());
+        clickGo("cara-bermain.html");
+      };
+      upd();
+    </script>
+  </body>
+</html>

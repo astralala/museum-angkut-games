@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Maskot Rig</title>
+    <link rel="stylesheet" href="css/rig.css" />
+  </head>
+  <body>
+    <div id="maskot"></div>
+    <div class="btns">
+      <button data-m="idle">Idle</button>
+      <button data-m="senang">Senang</button>
+      <button data-m="gembira">Gembira</button>
+      <button data-m="sedih">Sedih</button>
+    </div>
+    <script src="maskot-rig.js"></script>
+    <script>
+      const m = EcoMascotRig.create(document.getElementById("maskot"), { mood: "idle" });
+      const btns = document.querySelectorAll("button");
+      const sync = () => btns.forEach((b) => b.classList.toggle("on", b.dataset.m === m.mood));
+      btns.forEach(
+        (b) =>
+          (b.onclick = () => {
+            m.setMood(b.dataset.m);
+            sync();
+          }),
+      );
+      sync();
+    </script>
+  </body>
+</html>

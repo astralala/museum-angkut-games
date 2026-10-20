@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <title>Kembali ke Rumah</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div id="frame" class="mj pulang blurin">
+      <video id="bgv" src="assets/videos/menujubengkel.mp4" muted autoplay playsinline preload="auto"></video>
+      <img class="title" src="assets/elements/kembalikerumah.png" alt="Kembali ke Rumah" />
+      <script>
+        window.CFG = {};
+      </script>
+      <script src="js/common.js"></script>
+      <script>
+        need("area", "area.html");
+        /* pindah ke hasil saat video selesai (blur keluar); cadangan kalau video gagal/macet */
+        const v = document.getElementById("bgv");
+        let done = false;
+        const end = () => {
+          if (done) return;
+          done = true;
+          goTo("hasil.html");
+        };
+        v.addEventListener(
+          "ended",
+          end,
+        ); /* video belum ada / gagal: tampilkan gambar latar saja, pindah setelah 5 detik */
+        v.addEventListener("error", () => {
+          v.remove();
+          setTimeout(end, 5000);
+        });
+        v.play().catch((e) => {
+          if (e.name === "NotAllowedError") setTimeout(end, 5000);
+        });
+        document.addEventListener("visibilitychange", () => {
+          if (!document.hidden && !done) v.play().catch(() => {});
+        });
+        setTimeout(end, 13000);
+      </script>
+    </div>
+  </body>
+</html>

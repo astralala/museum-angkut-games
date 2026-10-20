@@ -1,0 +1,199 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+  font-family: "Fredoka", system-ui, sans-serif;
+  color: #16365a;
+}
+button {
+  font: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Tombol mute dari sfx.js */
+body > .key {
+  border: 0;
+  border-radius: 12px;
+  padding: 6px 10px;
+  font-size: 1.4rem;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 3px 0 #9bb;
+  cursor: pointer;
+}
+
+/* Stage 1920x1080, di-scale agar selalu 16:9 dan muat di layar (HD, 2K, 4K) */
+#stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: center center;
+  transform: translate(-50%, -50%) scale(var(--scale, 1));
+  background: url("../assets/home_bg_misi_makanan_lokal.png") center / cover no-repeat;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* Panel kaca transparan tempat keyboard */
+.panel {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 1240px;
+  padding: 48px 64px 52px;
+  border-radius: 48px;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.28));
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border: 3px solid rgba(255, 255, 255, 0.75);
+  box-shadow:
+    0 24px 60px rgba(10, 60, 30, 0.28),
+    inset 0 2px 0 rgba(255, 255, 255, 0.8);
+  text-align: center;
+}
+
+h2 {
+  font-size: 72px;
+  font-weight: 700;
+  line-height: 1.05;
+  color: #fff;
+  -webkit-text-stroke: 3px #157a32;
+  paint-order: stroke fill;
+  text-shadow:
+    0 6px 0 #157a32,
+    0 10px 18px rgba(0, 0, 0, 0.25);
+}
+.sub {
+  display: inline-block;
+  margin-top: 14px;
+  padding: 8px 28px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  font-size: 28px;
+  font-weight: 600;
+  color: #157a32;
+}
+
+#nama {
+  margin: 30px auto 0;
+  width: 820px;
+  min-height: 104px;
+  padding: 14px 24px;
+  border-radius: 28px;
+  background: #fff;
+  border: 5px solid #2eaa4a;
+  box-shadow:
+    inset 0 4px 10px rgba(0, 0, 0, 0.08),
+    0 6px 0 #157a32;
+  font-size: 60px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#nama.empty {
+  color: #9ab3a3;
+}
+
+/* Keyboard QWERTY */
+.kb {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: center;
+  margin: 32px 0 36px;
+}
+.kb div {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+}
+.kb .key {
+  width: 88px;
+  height: 80px;
+  border: 0;
+  border-radius: 18px;
+  background: linear-gradient(#ffffff, #eef7ee);
+  box-shadow:
+    0 6px 0 #9cc7a6,
+    0 10px 14px rgba(0, 0, 0, 0.12);
+  font-size: 38px;
+  font-weight: 700;
+  color: #16365a;
+  cursor: pointer;
+  transition:
+    transform 0.08s,
+    box-shadow 0.08s;
+}
+.kb .key:active {
+  transform: translateY(5px);
+  box-shadow: 0 1px 0 #9cc7a6;
+}
+.kb .key.wide {
+  width: 420px;
+  font-size: 30px;
+  letter-spacing: 3px;
+}
+.kb .key.del {
+  width: 140px;
+  background: linear-gradient(#ffe9d6, #ffd2ad);
+  box-shadow:
+    0 6px 0 #e0a06a,
+    0 10px 14px rgba(0, 0, 0, 0.12);
+}
+
+/* Tombol: bentuk sama, Kembali transparan, Lanjut hijau */
+.actions {
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+}
+.pill {
+  width: 380px;
+  height: 104px;
+  border-radius: 999px;
+  font-size: 44px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition:
+    transform 0.1s,
+    filter 0.2s;
+}
+.pill:active {
+  transform: translateY(5px);
+}
+#go {
+  border: 5px solid #157a32;
+  color: #fff;
+  background: linear-gradient(#6be27f, #2eaa4a 55%, #22923c);
+  box-shadow:
+    0 8px 0 #157a32,
+    0 14px 22px rgba(0, 0, 0, 0.25),
+    inset 0 3px 0 rgba(255, 255, 255, 0.5);
+  text-shadow: 0 3px 0 #157a32;
+}
+#go:disabled {
+  filter: grayscale(1);
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+#back {
+  border: 5px solid #157a32;
+  color: #157a32;
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow:
+    0 8px 0 rgba(21, 122, 50, 0.55),
+    0 14px 22px rgba(0, 0, 0, 0.15),
+    inset 0 3px 0 rgba(255, 255, 255, 0.6);
+}

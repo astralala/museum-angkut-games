@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Isi Nama</title>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/nama.css" />
+    <link rel="stylesheet" href="css/loading.css" />
+    <script src="../bgm.js"></script>
+  </head>
+  <body class="loading">
+    <div id="stage" class="stage">
+      <div class="center">
+        <div class="title"><span>Siapa</span> <span class="o">Namamu?</span></div>
+
+        <div class="panel">
+          <div id="f" class="empty">Nama kamu…</div>
+          <div id="err"></div>
+          <div class="kb" id="kb"></div>
+          <div class="actions">
+            <button class="pill btn" id="back"><span class="tri"></span>BACK</button>
+            <button class="pill btn" id="go"><span class="tri"></span>CONTINUE</button>
+          </div>
+        </div>
+      </div>
+      <div id="veil"></div>
+    </div>
+
+    <script src="common.js"></script>
+    <script>
+      // Scaling responsif: jaga rasio 16:9, muat di layar berapa pun resolusinya
+      function fit() {
+        const s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+        document.documentElement.style.setProperty("--scale", s);
+      }
+      window.addEventListener("resize", fit);
+      fit();
+
+      let nm = "";
+      const MAX = 12;
+      const rows = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
+      const kb = $("kb");
+      rows.forEach((r, i) => {
+        const d = document.createElement("div");
+        d.className = "row";
+        [...r].forEach((c) => d.append(mk(c, () => add(c))));
+        if (i == 2) d.append(mk("⌫", del, "w"));
+        kb.append(d);
+      });
+      const last = document.createElement("div");
+      last.className = "row";
+      last.append(
+        mk("SPASI", () => add(" "), "sp"),
+        mk(
+          "Hapus",
+          () => {
+            nm = "";
+            show();
+          },
+          "w",
+        ),
+      );
+      kb.append(last);
+
+      function mk(t, fn, cls) {
+        const b = document.createElement("button");
+        b.className = "key " + (cls || "");
+        b.textContent = t;
+        b.onclick = fn;
+        return b;
+      }
+      function add(c) {
+        if (nm.length < MAX) {
+          nm += c.toUpperCase();
+          show();
+        }
+      }
+      function del() {
+        nm = nm.slice(0, -1);
+        show();
+      }
+      function show() {
+        const f = $("f");
+        f.textContent = nm || "Nama kamu…";
+        f.classList.toggle("empty", !nm);
+        $("err").textContent = "";
+      }
+
+      document.addEventListener("keydown", (e) => {
+        if (/^[a-z]$/i.test(e.key)) add(e.key.toUpperCase());
+        else if (e.key === " ") add(" ");
+        else if (e.key === "Backspace") del();
+        else if (e.key === "Enter") $("go").click();
+      });
+
+      $("go").onclick = () => {
+        const n = nm.trim();
+        if (!n) {
+          $("err").textContent = "Isi nama dulu ya!";
+          return;
+        }
+        S.set("name", n);
+        S.set("score", 0);
+        S.set("level", 1);
+        goTo("cara-bermain.html");
+      };
+      $("back").onclick = () => {
+        goTo("index.html");
+      };
+    </script>
+  </body>
+</html>

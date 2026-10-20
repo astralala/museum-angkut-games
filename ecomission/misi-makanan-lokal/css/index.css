@@ -1,0 +1,154 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+}
+
+/* Stage 1920x1080, di-scale agar selalu 16:9 dan muat di layar (HD, 2K, 4K) */
+#stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: center center;
+  transform: translate(-50%, -50%) scale(var(--scale, 1));
+  background: url("../assets/home_bg_misi_makanan_lokal.png") center / cover no-repeat;
+  overflow: hidden;
+  user-select: none;
+}
+#stage img {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+}
+
+/* Posisi diukur dari area gambar yang tidak transparan agar pas dengan referensi */
+#title {
+  left: 469px;
+  top: 127px;
+  width: 969px;
+  animation: titleWobble 4s ease-in-out infinite;
+}
+#tabs {
+  left: 550px;
+  top: 652px;
+  width: 799px;
+}
+/* Maskot Bubum animasi menyapa (rig di ../bubum/menyapa.html) */
+#maskot {
+  position: absolute;
+  left: 15px;
+  top: 400px;
+  width: 560px;
+  height: 702px;
+  border: 0;
+  background: transparent;
+  pointer-events: none;
+}
+#keranjang {
+  left: 1438px;
+  top: 426px;
+  width: 480px;
+}
+
+#play {
+  position: absolute;
+  left: 716px;
+  top: 512px;
+  width: 461px;
+  height: 129px;
+  background: url("../assets/home_btn_play.png") center / contain no-repeat;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s;
+  animation: pulse 1.6s ease-in-out infinite;
+  -webkit-tap-highlight-color: transparent;
+}
+#play:active {
+  transform: scale(0.97);
+  animation: none;
+}
+
+/* Saat memuat: layar kaca buram (ala iPhone) menutupi stage; animasi ditahan
+     sampai seluruh gambar (termasuk rig Bubum di iframe) selesai dimuat */
+#veil {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  background: rgba(255, 255, 255, 0.18);
+  transition: opacity 0.6s ease;
+}
+body:not(.loading) #veil {
+  opacity: 0;
+  pointer-events: none;
+}
+.loading #stage *,
+.loading #stage {
+  animation-play-state: paused !important;
+}
+/* Semua elemen disembunyikan selama memuat, lalu muncul bersamaan */
+#stage > :not(#veil) {
+  transition:
+    opacity 0.5s ease,
+    transform 0.15s;
+}
+.loading #stage > :not(#veil) {
+  opacity: 0;
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+/* Judul: berdenyut zoom pelan, lalu sesekali goyang-goyang sebentar */
+@keyframes titleWobble {
+  0%,
+  100% {
+    transform: scale(1) rotate(0);
+  }
+  30% {
+    transform: scale(1.04) rotate(0);
+  }
+  60% {
+    transform: scale(1) rotate(0);
+  }
+  66% {
+    transform: scale(1.03) rotate(-3deg);
+  }
+  72% {
+    transform: scale(1.03) rotate(3deg);
+  }
+  78% {
+    transform: scale(1.03) rotate(-2deg);
+  }
+  84% {
+    transform: scale(1.02) rotate(1.5deg);
+  }
+  90% {
+    transform: scale(1) rotate(0);
+  }
+}

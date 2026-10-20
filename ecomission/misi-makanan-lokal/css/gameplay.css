@@ -1,0 +1,266 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+  font-family: "Fredoka", system-ui, sans-serif;
+  color: #10324f;
+}
+button {
+  font: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Tombol mute dari sfx.js */
+body > .key {
+  border: 0;
+  border-radius: 12px;
+  padding: 6px 10px;
+  font-size: 1.4rem;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 3px 0 #9bb;
+  cursor: pointer;
+}
+
+/* Stage 1920x1080, di-scale agar selalu 16:9 dan muat di layar (HD, 2K, 4K) */
+#stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: center center;
+  transform: translate(-50%, -50%) scale(var(--scale, 1));
+  background: url("../assets/home_bg_misi_makanan_lokal.png") center / cover no-repeat;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* Semua elemen ditata dengan koordinat gambar referensi (lokal_0000_referensimakanan.png, 1590x893)
+     lalu diperbesar 1.0868x dan diletakkan di tengah, menyisakan jarak 5% di kiri-kanan dan atas-bawah
+     (1590x893 → 1728x971 di stage 1920x1080). Buka dengan ?ref untuk melihat referensi sebagai overlay. */
+#game {
+  position: absolute;
+  left: 96px;
+  top: 55px;
+  width: 1590px;
+  height: 893px;
+  transform: scale(1.0868);
+  transform-origin: 0 0;
+}
+#game img {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+}
+#game #ref {
+  left: 0;
+  top: 0;
+  width: 1590px;
+  opacity: 0.45;
+  z-index: 50;
+  display: none;
+}
+.show-ref #game #ref {
+  display: block;
+}
+
+#t-pilih {
+  left: 17px;
+  top: 3px;
+  width: 809px;
+}
+#t-susun {
+  left: 822px;
+  top: 0px;
+  width: 705px;
+}
+#panel {
+  left: 11px;
+  top: 182px;
+  width: 828px;
+}
+#piring {
+  left: 841px;
+  top: 215px;
+  width: 689px;
+}
+#meter {
+  left: 0px;
+  top: 715px;
+  width: 1096px;
+}
+#mobil {
+  left: 28px;
+  top: 738px;
+  width: 155px;
+}
+
+/* Kotak makanan di panel kiri (posisi tiap sel panel) */
+.food {
+  position: absolute;
+  cursor: grab;
+  touch-action: none;
+  transition:
+    opacity 0.2s,
+    transform 0.15s,
+    filter 0.2s;
+}
+.food img {
+  position: static !important;
+}
+.food:active {
+  transform: scale(0.96);
+}
+.food.used {
+  opacity: 0.35;
+  filter: grayscale(1);
+}
+
+.ghost {
+  position: fixed;
+  z-index: 99;
+  pointer-events: none;
+  opacity: 0.95;
+}
+
+/* Area piring per kategori: gambar area kosong, berganti gambar makanan saat diisi */
+.slot {
+  position: absolute;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.slot img {
+  position: static !important;
+  display: block;
+  width: 100%;
+}
+.slot.hot {
+  transform: scale(1.06);
+  filter: drop-shadow(0 0 10px #22c55e);
+}
+.slot.bad {
+  animation: shake 0.3s;
+}
+
+/* Mobil kecil yang berjalan di atas bar meter */
+#truck {
+  left: 230.5px;
+  top: 767px;
+  width: 65px;
+  transform: translateX(-50%);
+  transition: none;
+}
+#km {
+  position: absolute;
+  left: 640px;
+  top: 722px;
+  width: 430px;
+  text-align: right;
+  font-size: 30px;
+  font-weight: 700;
+  color: #10324f;
+}
+
+/* ---------- Tombol pilih (koordinat stage, di luar #game agar bisa di atas Bubum) ---------- */
+#pilih {
+  position: absolute;
+  left: 1347px;
+  top: 881px;
+  z-index: 3;
+  width: 375px;
+  height: 109px;
+  border-radius: 999px;
+  border: 6px solid #0f6b2a;
+  background: linear-gradient(#7aea84, #2eaa4a 55%, #1f8f3a);
+  box-shadow:
+    0 10px 0 #0f6b2a,
+    0 18px 26px rgba(0, 0, 0, 0.3),
+    inset 0 4px 0 rgba(255, 255, 255, 0.55);
+  color: #fff;
+  font-size: 31px;
+  font-weight: 700;
+  text-shadow: 0 3px 0 #0f6b2a;
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+#pilih:not(:disabled) {
+  animation: pulse 1.6s ease-in-out infinite;
+}
+#pilih:active:not(:disabled) {
+  transform: translateY(6px);
+  animation: none;
+}
+#pilih:disabled {
+  filter: grayscale(1);
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+/* Maskot Bubum di pojok kanan bawah (rig di ../bubum/home2.html), koordinat stage */
+/* Urutan lapisan: elemen game (1) → Bubum (2) → tombol Pilih Makanan Ini (3) */
+#maskot {
+  position: absolute;
+  left: 1418px;
+  top: 571px;
+  width: 384px;
+  height: 504px;
+  border: 0;
+  background: transparent;
+  pointer-events: none;
+  z-index: 2;
+}
+#game {
+  z-index: 1;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+@keyframes shake {
+  25% {
+    transform: translateX(-8px);
+  }
+  75% {
+    transform: translateX(8px);
+  }
+}
+
+/* Saat memuat: layar kaca buram menutupi stage sampai semua gambar selesai dimuat */
+#veil {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  background: rgba(255, 255, 255, 0.18);
+  transition: opacity 0.6s ease;
+}
+body:not(.loading) #veil {
+  opacity: 0;
+  pointer-events: none;
+}
+#game,
+#maskot,
+#pilih {
+  transition:
+    opacity 0.5s ease,
+    filter 0.2s;
+}
+.loading #game,
+.loading #maskot,
+.loading #pilih {
+  opacity: 0;
+}

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Eco Mission Challenge - Pilih Game</title>
+    <link rel="stylesheet" href="css/choose_game.css" />
+    <script src="bgm.js"></script>
+  </head>
+  <body>
+    <div id="stage">
+      <img id="title" src="assets/title_choose.png" alt="Choose Your Game - Pilih Game Kamu" />
+
+      <!-- Awalnya kartu bertombol "Select" (assets/select_*.png); setelah dipilih diganti kartu bertombol "Play" (data-play) -->
+      <a class="misi" id="misi-makanan" href="misi-makanan-lokal/index.html"
+        ><img src="assets/select_makanansehat.png" alt="Misi Makanan Sehat untuk Bumi" /><img
+          class="play"
+          src="assets/btn_misi_makanan.png"
+          alt=""
+      /></a>
+      <a class="misi" id="misi-energi" href="misi-energi-bersih/index.html"
+        ><img src="assets/select_misienergi.png" alt="Misi Energi Bersih" /><img
+          class="play"
+          src="assets/btn_misi_energi.png"
+          alt=""
+      /></a>
+      <a class="misi" id="misi-kurangi" href="kurangi_sampah_sisa_makanan/index.html"
+        ><img src="assets/select_kurangi.png" alt="Kurangi Sampah Sisa Makanan" /><img
+          class="play"
+          src="assets/btn_kurangi.png"
+          alt=""
+      /></a>
+    </div>
+
+    <script src="sfx.js"></script>
+    <script>
+      // Scaling responsif: jaga rasio 16:9, muat di layar berapa pun resolusinya
+      function fit() {
+        const s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+        document.documentElement.style.setProperty("--scale", s);
+      }
+      window.addEventListener("resize", fit);
+      fit();
+
+      // Tap pertama: kartu membesar (terpilih). Tap kedua di kartu yang sama: masuk ke game.
+      // Kartu "Select" berubah jadi "Play" lewat crossfade CSS (class .selected)
+      let selected = null;
+      document.querySelectorAll(".misi").forEach((el) => {
+        el.addEventListener("click", (e) => {
+          e.preventDefault();
+          if (selected === el) {
+            clickGo(el.href);
+            return;
+          } // tap kedua: bunyi "tip" lalu masuk ke game
+          clickSfx();
+          if (selected) selected.classList.remove("selected");
+          el.classList.add("selected");
+          selected = el;
+          document.getElementById("stage").classList.add("has-selection");
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <title>Menuju Komplek Perumahan</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div id="frame" class="mj mobil-perumahan blurin">
+      <video id="bgv" src="assets/videos/menujuperumahan.mp4" muted autoplay playsinline preload="auto"></video>
+      <img class="title" src="assets/elements/menujukomplekperumahan.png" alt="Menuju Komplek Perumahan" />
+      <script>
+        window.CFG = {};
+      </script>
+      <script src="js/common.js"></script>
+      <script>
+        need("area", "area.html");
+        /* pindah ke game saat video selesai (blur keluar); cadangan kalau video gagal/macet */
+        const v = document.getElementById("bgv");
+        let done = false;
+        const end = () => {
+          if (done) return;
+          done = true;
+          goTo("game-perumahan.html");
+        };
+        v.addEventListener("ended", end);
+        v.addEventListener("error", end);
+        v.play().catch((e) => {
+          if (e.name === "NotAllowedError") setTimeout(end, 5000);
+        });
+        document.addEventListener("visibilitychange", () => {
+          if (!document.hidden && !done) v.play().catch(() => {});
+        });
+        setTimeout(end, 13000);
+      </script>
+    </div>
+  </body>
+</html>

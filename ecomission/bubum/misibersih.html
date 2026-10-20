@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bubum Misi Bersih</title>
+    <link rel="stylesheet" href="css/misibersih.css" />
+  </head>
+  <body>
+    <div class="stage" id="stage">
+      <div class="spark s1"></div>
+      <div class="spark s2"></div>
+      <div class="spark s3"></div>
+      <div class="spark s4"></div>
+
+      <div class="walker">
+        <img class="leg-back" src="assets/misibersih_0006_kaki-kiri-belakang.png" alt="" />
+        <img class="leg-front" src="assets/misibersih_0005_kaki-kanan.png" alt="" />
+
+        <div class="upper">
+          <img class="hand-l" src="assets/misibersih_0008_tangan-kanan.png" alt="" />
+          <img class="hand-r" src="assets/misibersih_0007_tangan-kanan.png" alt="" />
+          <img class="body" src="assets/misibersih_0009_badan.png" alt="Bubum" />
+          <img class="leaf" src="assets/misibersih_0000_daun.png" alt="" />
+
+          <div class="face" id="face">
+            <img class="cheek l" src="assets/misibersih_0002_pipi.png" alt="" />
+            <img class="cheek r" src="assets/misibersih_0002_pipi.png" alt="" />
+            <img class="brow l" src="assets/misibersih_0004_alis.png" alt="" />
+            <img class="brow r" src="assets/misibersih_0004_alis.png" alt="" />
+            <img class="eyes l" src="assets/misibersih_0003_mata.png" alt="" />
+            <img class="eyes r" src="assets/misibersih_0003_mata.png" alt="" />
+            <img class="mouth" src="assets/misibersih_0001_mulut.png" alt="" />
+          </div>
+        </div>
+      </div>
+
+      <img class="ref" src="assets/misibersih_ref.webp" alt="" />
+    </div>
+
+    <script>
+      const stage = document.getElementById("stage");
+      if (location.search.includes("ref")) stage.classList.add("show-ref");
+
+      function fit() {
+        // Lebar 1010 (bukan 860) agar tangan kanan yang keluar dari stage tidak terpotong
+        const s = Math.min(innerWidth / 1010, innerHeight / 1100) * 0.94;
+        const x = (innerWidth - 1010 * s) / 2,
+          y = (innerHeight - 1100 * s) / 2;
+        stage.style.transform = `translate(${x}px, ${y}px) scale(${s})`;
+      }
+      addEventListener("resize", fit);
+      fit();
+
+      const face = document.getElementById("face");
+      function blinkOnce(done) {
+        face.classList.add("blink");
+        setTimeout(() => {
+          face.classList.remove("blink");
+          done && done();
+        }, 120);
+      }
+      function scheduleBlink() {
+        setTimeout(
+          () => {
+            blinkOnce(() => {
+              if (Math.random() < 0.25) setTimeout(() => blinkOnce(scheduleBlink), 160);
+              else scheduleBlink();
+            });
+          },
+          2000 + Math.random() * 3000,
+        );
+      }
+      scheduleBlink();
+    </script>
+  </body>
+</html>

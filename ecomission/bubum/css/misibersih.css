@@ -1,0 +1,272 @@
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: transparent;
+  overflow: hidden;
+}
+
+/* Stage memakai koordinat gambar referensi x0.78 (860 x 1100) */
+.stage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 860px;
+  height: 1100px;
+  transform-origin: 0 0;
+}
+.stage img {
+  position: absolute;
+  display: block;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Overlay referensi untuk mencocokkan posisi: buka dengan ?ref */
+.stage .ref {
+  left: 0;
+  top: 0;
+  width: 860px;
+  opacity: 0.35;
+  z-index: 99;
+  display: none;
+}
+.stage.show-ref .ref {
+  display: block;
+}
+.show-ref * {
+  animation-play-state: paused !important;
+}
+
+/* Seluruh badan maju-mundur sedikit, seperti melangkah riang */
+.walker {
+  position: absolute;
+  inset: 0;
+  animation: sway 1.2s ease-in-out infinite;
+  transform-origin: 430px 1050px;
+}
+@keyframes sway {
+  0%,
+  100% {
+    transform: rotate(-1.5deg);
+  }
+  50% {
+    transform: rotate(1.5deg);
+  }
+}
+
+/* ---------- Kaki: melangkah bergantian ---------- */
+.leg-back {
+  left: 100px;
+  top: 685px;
+  transform-origin: 85% 5%;
+  animation: stepA 1.2s ease-in-out infinite;
+}
+.leg-front {
+  left: 505px;
+  top: 700px;
+  transform-origin: 20% 10%;
+  animation: stepB 1.2s ease-in-out infinite;
+}
+@keyframes stepA {
+  0%,
+  100% {
+    transform: rotate(-8deg) translateY(-8px);
+  }
+  50% {
+    transform: rotate(-20deg);
+  }
+}
+@keyframes stepB {
+  0%,
+  100% {
+    transform: rotate(-8deg);
+  }
+  50% {
+    transform: rotate(12deg) translateY(-14px);
+  }
+}
+
+/* ---------- Badan atas: memantul tiap langkah ---------- */
+.upper {
+  position: absolute;
+  inset: 0;
+  transform-origin: 430px 830px;
+  animation: bob 0.6s ease-in-out infinite;
+}
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0) scale(1.01, 0.99);
+  }
+  50% {
+    transform: translateY(-9px) scale(0.99, 1.01);
+  }
+}
+
+.body {
+  left: 156px;
+  top: 265px;
+}
+.leaf {
+  left: 181px;
+  top: 82px;
+}
+
+/* ---------- Wajah ---------- */
+.face {
+  position: absolute;
+  inset: 0;
+}
+/* Aset mata/alis/pipi berisi sepasang; dipotong per sisi agar jaraknya bisa dilebarkan */
+.l {
+  clip-path: inset(0 50% 0 0);
+}
+.r {
+  clip-path: inset(0 0 0 50%);
+}
+.brow {
+  animation: brow 1.2s ease-in-out infinite;
+}
+.brow.l {
+  left: 268px;
+  top: 425px;
+  scale: 0.72;
+  transform-origin: 83px 31px;
+}
+.brow.r {
+  left: 285px;
+  top: 396px;
+  scale: 0.72;
+  transform-origin: 249px 31px;
+}
+@keyframes brow {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+.eyes {
+  scale: 0.64;
+  transition: transform 70ms ease-in;
+}
+.eyes.l {
+  left: 258px;
+  top: 438px;
+  transform-origin: 93px 65px;
+}
+.eyes.r {
+  left: 272px;
+  top: 414px;
+  transform-origin: 279px 65px;
+}
+.blink .eyes {
+  transform: scaleY(0.08);
+}
+.cheek.l {
+  left: 252px;
+  top: 509px;
+  scale: 0.7;
+  transform-origin: 93px 51px;
+}
+.cheek.r {
+  left: 307px;
+  top: 484px;
+  scale: 0.7;
+  transform-origin: 278px 51px;
+}
+.mouth {
+  left: 362px;
+  top: 500px;
+  scale: 0.72;
+  transform-origin: 50% 20%;
+  animation: laugh 0.6s ease-in-out infinite;
+}
+@keyframes laugh {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(1.04, 0.9);
+  }
+}
+
+/* ---------- Tangan: kepal semangat, mengayun berlawanan ---------- */
+.hand-l {
+  left: -10px;
+  top: 350px;
+  transform-origin: 85% 75%;
+  animation: pumpL 1.2s ease-in-out infinite;
+}
+.hand-r {
+  left: 600px;
+  top: 290px;
+  transform-origin: 15% 85%;
+  animation: pumpR 1.2s ease-in-out infinite;
+}
+@keyframes pumpL {
+  0%,
+  100% {
+    transform: rotate(8deg);
+  }
+  50% {
+    transform: rotate(-10deg) translateY(-12px);
+  }
+}
+@keyframes pumpR {
+  0%,
+  100% {
+    transform: rotate(-10deg) translateY(-12px);
+  }
+  50% {
+    transform: rotate(8deg);
+  }
+}
+
+/* ---------- Garis semangat (seperti di referensi) ---------- */
+.spark {
+  position: absolute;
+  width: 38px;
+  height: 82px;
+  border-radius: 6px;
+  background: linear-gradient(#ffd21f, #ff9a0a);
+  clip-path: polygon(0 0, 100% 0, 75% 100%, 25% 100%);
+  animation: spark 1.2s ease-in-out infinite;
+}
+.s1 {
+  left: 105px;
+  top: 165px;
+  transform: rotate(-38deg);
+}
+.s2 {
+  left: 55px;
+  top: 245px;
+  transform: rotate(-70deg);
+  animation-delay: 0.15s;
+}
+.s3 {
+  left: 725px;
+  top: 105px;
+  transform: rotate(34deg);
+}
+.s4 {
+  left: 775px;
+  top: 190px;
+  transform: rotate(58deg);
+  animation-delay: 0.15s;
+}
+@keyframes spark {
+  0%,
+  100% {
+    opacity: 0.35;
+    scale: 0.8;
+  }
+  50% {
+    opacity: 1;
+    scale: 1.08;
+  }
+}

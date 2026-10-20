@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <title>Isi Nama</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div id="frame" class="nm blurin">
+      <div class="topblur"></div>
+      <img class="logo" src="assets/elements/logo_toyota_berbagi.png" alt="Toyota Berbagi" />
+      <img class="title" src="assets/elements/siapanama.png" alt="Siapa Nama Kamu?" />
+      <div class="box" id="nm"></div>
+      <div class="kb" id="kb"></div>
+      <button class="next" id="go" aria-label="Continue" onclick="go()" disabled></button>
+      <img class="tabs" src="assets/elements/3columnhometab.png" alt="" />
+      <script>
+        window.CFG = {};
+      </script>
+      <script src="js/common.js"></script>
+      <script>
+        let nm = "";
+        const el = document.getElementById("nm"),
+          kb = document.getElementById("kb");
+        function draw() {
+          el.innerHTML = nm
+            ? esc(nm) + '<span class="cur"></span>'
+            : '<span class="cur"></span><span class="ph">Nama kamu di sini...</span>';
+          document.getElementById("go").disabled = !nm.trim();
+        }
+        function esc(s) {
+          return s.replace(/ /g, "&nbsp;");
+        }
+        const MAX = 10;
+        function key(k) {
+          SFX.click();
+          if (k === "⌫") nm = nm.slice(0, -1);
+          else if (k === " ") {
+            if (nm && !nm.endsWith(" ") && nm.length < MAX) nm += " ";
+          } else if (nm.length < MAX) nm += k;
+          draw();
+        }
+        function mk(c, cls, label) {
+          const b = document.createElement("button");
+          if (cls) b.className = cls;
+          b.innerHTML = label || c;
+          b.onclick = () => key(c);
+          return b;
+        }
+        ["ABCDEFG", "HIJKLMN", "OPQRSTU", "VWXYZ"].forEach((r) => {
+          const d = document.createElement("div");
+          d.className = "row";
+          [...r].forEach((c) => d.appendChild(mk(c)));
+          if (r[0] === "V")
+            d.appendChild(
+              mk(
+                "⌫",
+                "del",
+                '<svg viewBox="0 0 78 50" aria-label="Hapus"><path d="M22 2h50a4 4 0 0 1 4 4v38a4 4 0 0 1-4 4H22L2 25z" fill="#fff"/><path d="M38 15l20 20M58 15L38 35" stroke="#8e9aab" stroke-width="7" stroke-linecap="round"/></svg>',
+              ),
+            );
+          kb.appendChild(d);
+        });
+        const sp = document.createElement("div");
+        sp.className = "row";
+        sp.appendChild(mk(" ", "space", "Space"));
+        kb.appendChild(sp);
+        function go() {
+          S.set("nama", nm.trim());
+          goTo("area.html");
+        }
+        draw();
+      </script>
+    </div>
+  </body>
+</html>

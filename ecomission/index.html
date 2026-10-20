@@ -1,152 +1,47 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Eco Mission Challenge</title>
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body {
-    width: 100%; height: 100%;
-    overflow: hidden;
-    background: #000;
-  }
-  body { display: flex; align-items: center; justify-content: center; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Eco Mission Challenge</title>
+    <link rel="stylesheet" href="css/index.css" />
+    <script src="bgm.js"></script>
+  </head>
+  <body class="loading">
+    <div id="stage">
+      <img id="logo" src="assets/logo_toyota_berbagi.png" alt="Toyota Berbagi" />
+      <img id="title" src="assets/title.png" alt="Eco Mission Challenge" />
+      <iframe id="maskot" src="bubum/home.html" title="Maskot Bubum" scrolling="no" allowtransparency="true"></iframe>
+      <img id="bubble" src="assets/bubblespeech_home.png" alt="Yuk, pilih misi yang ingin kamu mainkan!" />
+      <img class="tabs c1" src="assets/3_tab.png" alt="" />
+      <img class="tabs c2" src="assets/3_tab.png" alt="" />
+      <img class="tabs c3" src="assets/3_tab.png" alt="" />
 
-  /* Stage 1920x1080, di-scale agar selalu 16:9 dan muat di layar (HD, 2K, 4K) */
-  #stage {
-    position: absolute;
-    left: 50%; top: 50%;
-    width: 1920px; height: 1080px;
-    transform-origin: center center;
-    transform: translate(-50%, -50%) scale(var(--scale, 1));
-    background: url("assets/bg_home.png") center / cover no-repeat;
-    overflow: hidden;
-    user-select: none;
-  }
-  #stage img { position: absolute; display: block; pointer-events: none; }
+      <button id="play" aria-label="Play"></button>
+      <button id="scanqr" aria-label="Scan QR kamu di kamera untuk bermain"></button>
+      <div id="veil"></div>
+    </div>
 
-  /* Posisi diukur dari area gambar yang tidak transparan agar pas dengan referensi */
-  #title   { left: 655px;  top: 30px;  width: 601px; animation: popIn .6s ease-out both, titleWobble 4s ease-in-out .6s infinite; }
-  /* Maskot Bubum animasi home (rig di bubum/home.html) */
-  #maskot  { position: absolute; left: 1143px; top: 80px; width: 525px; height: 510px; border: 0; background: transparent; pointer-events: none; animation: popIn .6s ease-out 2.6s both; }
-  #bubble  { left: 1531px; top: 71px;  width: 290px; transform-origin: 20% 100%; animation: popIn .5s ease-out 3.2s both, bubbleFloat 3s ease-in-out 3.7s infinite, bubbleWiggle 4s ease-in-out 5s infinite; }
-  /* Float pakai properti `translate` agar tidak bentrok dengan `transform` milik wiggle */
-  @keyframes bubbleFloat {
-    0%, 100% { translate: 0 0; }
-    50%      { translate: 0 -8px; }
-  }
-  @keyframes bubbleWiggle {
-    0%, 60%, 84%, 100% { transform: scale(1) rotate(0); }
-    66%      { transform: scale(1.06) rotate(-3deg); }
-    72%      { transform: scale(1.06) rotate(3deg); }
-    78%      { transform: scale(1.06) rotate(-2deg); }
-  }
-  /* Satu gambar 3 tab dipakai tiga kali, tiap salinan hanya menampilkan satu kartu, agar bisa muncul bergantian */
-  .tabs    { left: 314px;  top: 267px; width: 1291px; animation: popIn .5s ease-out both; }
-  .tabs.c1 { clip-path: inset(0 66.6% 0 0);     animation-delay: .5s;  transform-origin: 17% 50%; }
-  .tabs.c2 { clip-path: inset(0 33.4% 0 33.4%); animation-delay: 1s;   transform-origin: 50% 50%; }
-  .tabs.c3 { clip-path: inset(0 0 0 66.6%);     animation-delay: 1.5s;  transform-origin: 83% 50%; }
+    <script src="preload-list.js"></script>
+    <script src="preload.js"></script>
 
-  #play {
-    position: absolute;
-    left: 671px; top: 852px;
-    width: 648px; height: 128px;
-    background: url("assets/button_play.png") center / contain no-repeat;
-    border: none; cursor: pointer;
-    transition: transform .15s;
-    animation: popIn .5s ease-out 2s both, playWiggle 4s ease-in-out 2.5s infinite;
-  }
-  /* Saat hover hanya pulse yang dihentikan; popIn tetap dipertahankan agar tidak diputar ulang */
-  #play:hover  { transform: scale(1.05); animation: popIn .5s ease-out 2s both; }
+    <script src="sheet-local.js"></script>
 
-  /* Muncul berurutan: pakai opacity + properti `scale` agar tidak bentrok dengan `transform` animasi lain */
-  @keyframes popIn {
-    0%   { opacity: 0; scale: .6; }
-    70%  { opacity: 1; scale: 1.06; }
-    100% { opacity: 1; scale: 1; }
-  }
+    <script src="sfx.js"></script>
+    <script>
+      // Scaling responsif: jaga rasio 16:9, muat di layar berapa pun resolusinya
+      function fit() {
+        const s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+        document.documentElement.style.setProperty("--scale", s);
+      }
+      window.addEventListener("resize", fit);
+      fit();
 
-  /* Saat memuat: layar kaca buram (ala iPhone) menutupi stage; semua animasi ditahan
-     sampai seluruh gambar (termasuk rig Bubum di iframe) selesai dimuat */
-  #veil {
-    position: absolute; inset: 0; z-index: 10;
-    backdrop-filter: blur(24px) saturate(1.4); -webkit-backdrop-filter: blur(24px) saturate(1.4);
-    background: rgba(255,255,255,.18);
-    transition: opacity .6s ease;
-  }
-  body:not(.loading) #veil { opacity: 0; pointer-events: none; }
-  .loading #stage *, .loading #stage { animation-play-state: paused !important; }
-  #play:active { transform: scale(.97); }
+      // Tunggu preloader (semua aset game di-cache) dan `load` halaman; baru buka kaca buram dan mulai animasi
+      window.PRELOAD_DONE.then(() => document.body.classList.remove("loading"));
 
-  /* Tombol keterangan "Scan QR kamu" di pojok kiri bawah */
-  #scanqr {
-    position: absolute;
-    left: 4px; top: 811px;
-    width: 621px; height: 269px;   /* ±15% lebih besar, tetap menempel di pojok kiri bawah */
-    background: url("assets/scanqr.png") center / contain no-repeat;
-    border: none; cursor: pointer;
-    transform-origin: 0 100%;
-    animation: popIn .5s ease-out 2.3s both, pulse 3s ease-in-out 2.8s infinite;
-  }
-
-  @keyframes bob   { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
-  /* Judul: berdenyut zoom pelan, lalu sesekali goyang-goyang sebentar */
-  @keyframes titleWobble {
-    0%, 100% { transform: scale(1) rotate(0); }
-    30%      { transform: scale(1.04) rotate(0); }
-    60%      { transform: scale(1) rotate(0); }
-    66%      { transform: scale(1.03) rotate(-3deg); }
-    72%      { transform: scale(1.03) rotate(3deg); }
-    78%      { transform: scale(1.03) rotate(-2deg); }
-    84%      { transform: scale(1.02) rotate(1.5deg); }
-    90%      { transform: scale(1) rotate(0); }
-  }
-  /* Tombol Play: berdenyut, lalu sesekali goyang-goyang sebentar */
-  @keyframes playWiggle {
-    0%, 40%, 100% { transform: scale(1) rotate(0); }
-    20%      { transform: scale(1.04) rotate(0); }
-    60%      { transform: scale(1) rotate(0); }
-    66%      { transform: scale(1.04) rotate(-3deg); }
-    72%      { transform: scale(1.04) rotate(3deg); }
-    78%      { transform: scale(1.04) rotate(-2deg); }
-    84%      { transform: scale(1.02) rotate(1.5deg); }
-    90%      { transform: scale(1) rotate(0); }
-  }
-  @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.04); } }
-</style>
-</head>
-<body class="loading">
-  <div id="stage">
-    <img id="title"  src="assets/title.png"        alt="Eco Mission Challenge">
-    <iframe id="maskot" src="bubum/home.html" title="Maskot Bubum" scrolling="no" allowtransparency="true"></iframe>
-    <img id="bubble" src="assets/bubblespeech_home.png" alt="Yuk, pilih misi yang ingin kamu mainkan!">
-    <img class="tabs c1" src="assets/3_tab.png" alt="">
-    <img class="tabs c2" src="assets/3_tab.png" alt="">
-    <img class="tabs c3" src="assets/3_tab.png" alt="">
-
-    <button id="play" aria-label="Play"></button>
-    <button id="scanqr" aria-label="Scan QR kamu di kamera untuk bermain"></button>
-    <div id="veil"></div>
-  </div>
-
-<script src="sheet.js"></script>
-<script src="sfx.js"></script>
-<script>
-  // Scaling responsif: jaga rasio 16:9, muat di layar berapa pun resolusinya
-  function fit() {
-    const s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
-    document.documentElement.style.setProperty('--scale', s);
-  }
-  window.addEventListener('resize', fit);
-  fit();
-
-  // `load` menunggu semua gambar dan iframe; baru setelah itu buka kaca buram dan mulai urutan animasi
-  window.addEventListener('load', () => document.body.classList.remove('loading'));
-
-  // Bunyi "tik" (sfx.js) lalu ke halaman pilih umur
-  document.getElementById('play').addEventListener('click', () => clickGo('select_age.html'));
-</script>
-<script src="bgm.js"></script>
-</body>
+      // Bunyi "tik" (sfx.js) lalu ke halaman pilih umur
+      document.getElementById("play").addEventListener("click", () => clickGo("select_age.html"));
+    </script>
+  </body>
 </html>

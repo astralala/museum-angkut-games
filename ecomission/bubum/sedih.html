@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bubum Sedih</title>
+    <link rel="stylesheet" href="css/sedih.css" />
+  </head>
+  <body>
+    <div class="stage" id="stage">
+      <img class="leg-l" src="assets/sedih__0005_kaki1.png" alt="" />
+      <img class="leg-r" src="assets/sedih__0006_kaki2.png" alt="" />
+
+      <div class="upper">
+        <div class="shiver">
+          <img class="body" src="assets/sedih__0009_badan.png" alt="Bubum" />
+          <img class="leaf" src="assets/sedih__0010_daun.png" alt="" />
+
+          <div class="face" id="face">
+            <img class="brow" src="assets/sedih__0001_alis-sedih.png" alt="" />
+            <img class="eyes" src="assets/sedih__0003_mata-sedih-1.png" alt="" />
+            <img class="squeeze" src="assets/sedih__0004_mata-sedih-2.png" alt="" />
+            <img class="mouth" src="assets/sedih__0002_mulut-sedih.png" alt="" />
+          </div>
+
+          <img class="sweat" src="assets/sedih__0000_keringat.png" alt="" />
+          <div class="sweat-l-wrap"><img class="sweat" src="assets/sedih__0000_keringat.png" alt="" /></div>
+          <img class="hand-l" src="assets/sedih__0007_tangan1.png" alt="" />
+          <img class="hand-r" src="assets/sedih__0008_tangan2.png" alt="" />
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const stage = document.getElementById("stage");
+      if (location.search.includes("ref")) stage.classList.add("show-ref");
+
+      // Skala stage agar pas layar
+      function fit() {
+        const s = Math.min(innerWidth / 473, innerHeight / 709) * 0.78;
+        const x = (innerWidth - 473 * s) / 2,
+          y = (innerHeight - 709 * s) / 2;
+        stage.style.transform = `translate(${x}px, ${y}px) scale(${s})`;
+      }
+      addEventListener("resize", fit);
+      fit();
+
+      // Kedip cemas: mata memejam rapat (> <), lebih sering dari biasanya
+      const face = document.getElementById("face");
+      function blinkOnce(ms, done) {
+        face.classList.add("blink");
+        setTimeout(() => {
+          face.classList.remove("blink");
+          done && done();
+        }, ms);
+      }
+      function scheduleBlink() {
+        setTimeout(
+          () => {
+            const r = Math.random();
+            if (r < 0.2)
+              blinkOnce(500, scheduleBlink); // pejam lama, cemas
+            else if (r < 0.45)
+              blinkOnce(130, () => setTimeout(() => blinkOnce(130, scheduleBlink), 150)); // kedip dua kali
+            else blinkOnce(130, scheduleBlink);
+          },
+          1500 + Math.random() * 2500,
+        );
+      }
+      scheduleBlink();
+    </script>
+  </body>
+</html>
