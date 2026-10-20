@@ -1,5 +1,5 @@
 Source code game Eco Mission dan waste Sorting blm terintegrasi dengan database adit.
-Data pemain disimpan di localStorage browser.
+skrg ini data pemain hanya di localStorage browser.
 
 Cara Main :
 Player ada 2 metode cara untuk main
